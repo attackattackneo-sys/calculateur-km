@@ -1,6 +1,5 @@
 const STUDIO_ADDRESS = "16 boulevard Carnot, 93330 Neuilly-sur-Marne, France";
 
-// A REMPLACER par ta liste finale
 const NEARBY_CITIES = new Set([
   "Noisy-le-Grand",
   "Chelles",
@@ -14,12 +13,8 @@ function round1(n) {
   return Math.round(n * 10) / 10;
 }
 
-function normalizeCity(s) {
-  return (s || "").trim();
-}
-
 function computePrice({ city, department, distanceKm }) {
-  const cityN = normalizeCity(city);
+  const cityN = (city || "").trim();
 
   if (department === "75") {
     return { price: 150, explanation: "Paris (75) : tarif forfaitaire." };
@@ -55,29 +50,28 @@ function computePrice({ city, department, distanceKm }) {
 
 async function geocodeNominatim(address) {
   const url = new URL("https://nominatim.openstreetmap.org/search");
-  url.searchParams.set("q", `${address}, France`);
+  // On enlève le pays forcé ici pour laisser l'utilisateur taper ce qu'il veut, 
+  // mais on garde la restriction pays dans les paramètres.
+  url.searchParams.set("q", address);
   url.searchParams.set("format", "json");
   url.searchParams.set("addressdetails", "1");
   url.searchParams.set("limit", "1");
   url.searchParams.set("countrycodes", "fr");
 
   const r = await fetch(url.toString(), {
-    headers: { "User-Agent": "km-calculator/1.0 (contact: you@example.com)" }
+    headers: { "User-Agent": "greg-photo-calc/1.1" }
   });
+  
+  if (!r.ok) throw new Error("Erreur service météo/carte");
+  
   const j = await r.json();
-  if (!Array.isArray(j) || !j[0]) throw new Error("Geocode failed");
+  if (!Array.isArray(j) || j.length === 0) throw new Error("Adresse introuvable.");
 
   const item = j[0];
   const a = item.address || {};
 
-  const city =
-    a.city ||
-    a.town ||
-    a.village ||
-    a.municipality ||
-    a.county ||
-    "";
-
+  // Priorité aux noms de communes plus large pour Melun et consorts
+  const city = a.city || a.town || a.village || a.municipality || a.suburb || a.hamlet || "Ville inconnue";
   const postcode = a.postcode || "";
   const department = postcode.slice(0, 2);
 
@@ -90,54 +84,46 @@ async function geocodeNominatim(address) {
 }
 
 async function routeDistanceOsrmKm(fromLat, fromLon, toLat, toLon) {
-  const url = new URL(`https://router.project-osrm.org/route/v1/driving/${fromLon},${fromLat};${toLon},${toLat}`);
-  url.searchParams.set("overview", "false");
-
-  const r = await fetch(url.toString());
+  const url = `https://router.project-osrm.org/route/v1/driving/${fromLon},${fromLat};${toLon},${toLat}?overview=false`;
+  const r = await fetch(url);
   const j = await r.json();
-  if (j.code !== "Ok" || !j.routes?.[0]) throw new Error("Route failed");
-
-  const meters = j.routes[0].distance;
-  return meters / 1000;
+  if (j.code !== "Ok" || !j.routes?.[0]) throw new Error("Itinéraire impossible.");
+  return j.routes[0].distance / 1000;
 }
 
 module.exports = async (req, res) => {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST") return res.status(405).json({ error: "Méthode non autorisée" });
 
   try {
     const { address } = req.body || {};
-    if (!address || typeof address !== "string") {
-      return res.status(400).json({ error: "Adresse invalide." });
-    }
+    if (!address) return res.status(400).json({ error: "Saisissez une adresse." });
 
-    const studio = await geocodeNominatim(STUDIO_ADDRESS);
-    const client = await geocodeNominatim(address);
+    // 1. Géocodage du studio et du client en parallèle pour gagner du temps
+    const [studio, client] = await Promise.all([
+      geocodeNominatim(STUDIO_ADDRESS),
+      geocodeNominatim(address)
+    ]);
 
-    const distanceKmRaw = await routeDistanceOsrmKm(studio.lat, studio.lon, client.lat, client.lon);
-    const distanceKm = round1(distanceKmRaw);
+    // 2. Calcul de la distance
+    const distRaw = await routeDistanceOsrmKm(studio.lat, studio.lon, client.lat, client.lon);
+    const distanceKm = round1(distRaw);
 
+    // 3. Calcul du prix
     const pricing = computePrice({
       city: client.city,
       department: client.department,
       distanceKm
     });
 
-    if (pricing.price === null) {
-      return res.status(200).json({
-        cityLabel: client.city || "Adresse",
-        distanceKm,
-        price: "Sur devis",
-        explanation: pricing.explanation
-      });
-    }
-
     return res.status(200).json({
-      cityLabel: client.city || "Adresse",
+      cityLabel: client.city,
       distanceKm,
-      price: pricing.price,
+      price: pricing.price || "Sur devis",
       explanation: pricing.explanation
     });
-  } catch {
-    return res.status(400).json({ error: "Adresse introuvable ou itinéraire indisponible." });
+
+  } catch (err) {
+    // On renvoie le vrai message d'erreur pour aider l'utilisateur
+    return res.status(400).json({ error: err.message || "Une erreur est survenue." });
   }
 };
