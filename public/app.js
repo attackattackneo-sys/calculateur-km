@@ -8,8 +8,14 @@ function setLoading() {
 }
 
 function setError(msg) {
-  out.className = "out err"; // Utilise le style d'erreur du CSS
-  out.textContent = msg;
+  out.className = "out err";
+  out.innerHTML = `
+    <div style="font-weight: bold; margin-bottom: 5px;">Oups !</div>
+    <div>${msg}</div>
+    <div style="margin-top: 10px; font-size: 0.85rem; opacity: 0.8;">
+      Conseil : Essaye de préciser le code postal (ex: Melun 77000).
+    </div>
+  `;
 }
 
 function setResult(data) {
