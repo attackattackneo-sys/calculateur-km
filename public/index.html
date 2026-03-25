@@ -6,149 +6,59 @@
   <title>Calcul des frais de déplacement | GregPhotographe</title>
   <style>
     :root {
-      --primary-dark: #2c3e50; /* Pour le texte principal, garde une bonne lisibilité */
-      --accent-orange: #ff6600; /* Ton orange vif pour l'action et les résultats */
-      --hover-orange: #e65c00; /* Une nuance plus sombre pour le survol */
-      --bg-gradient: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); /* Un fond pêche très clair */
+      --primary-dark: #2c3e50;
+      --accent-orange: #ff6600;
+      --hover-orange: #e65c00;
+      --bg-gradient: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
       --glass-bg: rgba(255, 255, 255, 0.95);
     }
-
     body {
       font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg-gradient);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      color: var(--primary-dark);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0; color: var(--primary-dark);
     }
-
     .wrap {
-      background: var(--glass-bg);
-      padding: 2.5rem;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(255, 102, 0, 0.1); /* Ombre avec une pointe d'orange */
-      width: 100%;
-      max-width: 450px;
-      text-align: center;
-      border: 1px solid rgba(255, 102, 0, 0.1); /* Bordure légère orange */
+      background: var(--glass-bg); padding: 2.5rem;
+      border-radius: 20px; box-shadow: 0 10px 30px rgba(255, 102, 0, 0.1);
+      width: 100%; max-width: 450px; text-align: center;
+      border: 1px solid rgba(255, 102, 0, 0.1);
     }
-
-    h1 {
-      font-weight: 300;
-      margin-bottom: 2rem;
-      font-size: 1.8rem;
-      letter-spacing: 1px;
-    }
-
-    .input-group {
-      text-align: left;
-      margin-bottom: 1.5rem;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      opacity: 0.8;
-    }
-
+    h1 { font-weight: 300; margin-bottom: 2rem; font-size: 1.8rem; }
+    .input-group { text-align: left; margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; opacity: 0.8; }
     input {
-      width: 100%;
-      padding: 12px 15px;
-      border: 2px solid #eee;
-      border-radius: 10px;
-      font-size: 1rem;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      width: 100%; padding: 12px 15px; border: 2px solid #eee;
+      border-radius: 10px; font-size: 1rem; box-sizing: border-box;
+      transition: all 0.3s ease;
     }
-
-    input:focus {
-      outline: none;
-      border-color: var(--accent-orange);
-      box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.2); /* Effet de focus orange */
-    }
-
+    input:focus { outline: none; border-color: var(--accent-orange); box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.2); }
     button {
-      width: 100%;
-      padding: 15px;
-      background: var(--accent-orange);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+      width: 100%; padding: 15px; background: var(--accent-orange);
+      color: white; border: none; border-radius: 10px; font-size: 1rem;
+      font-weight: bold; cursor: pointer; transition: all 0.3s;
       box-shadow: 0 4px 6px rgba(255, 102, 0, 0.2);
     }
-
-    button:hover {
-      background: var(--hover-orange);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(255, 102, 0, 0.3);
-    }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(255, 102, 0, 0.2);
-    }
-
-    .out {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #eee;
-      min-height: 50px;
-      font-size: 1.1rem;
-    }
-.out.err {
-  border: 1px solid #ff4d4d;
-  background: #fff5f5;
-  color: #d63031;
-  border-radius: 12px;
-  padding: 15px;
-  margin-top: 20px;
-  animation: shake 0.4s ease-in-out; /* Petit effet pour attirer l'attention */
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-    /* Ces classes sont à utiliser dans ton JS app.js pour styliser le résultat */
-    .result-text {
-      color: var(--primary-dark);
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .price-tag {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: var(--accent-orange);
-      display: block;
-    }
+    button:hover { background: var(--hover-orange); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(255, 102, 0, 0.3); }
+    .out { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee; min-height: 50px; font-size: 1.1rem; }
+    .out.ok { border-top: 2px solid var(--accent-orange); background: rgba(255, 102, 0, 0.05); border-radius: 0 0 15px 15px; padding: 1.5rem; animation: fadeIn 0.5s ease; }
+    .out.err { border-top: 2px solid #e74c3c; color: #c0392b; background: #fdf2f2; border-radius: 12px; padding: 15px; animation: fadeIn 0.4s ease; }
+    .result-text { color: var(--primary-dark); margin-bottom: 0.5rem; display: block; font-weight: bold;}
+    .price-tag { font-size: 2.5rem; font-weight: bold; color: var(--accent-orange); display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
   <main class="wrap">
     <h1>Estimation de trajet</h1>
-
     <div class="input-group">
       <label for="address">Lieu de la prestation</label>
-      <input id="address" type="text" placeholder="Ville ou adresse complète..." />
+      <input id="address" type="text" placeholder="Ville ou code postal (ex: Melun 77000)..." />
     </div>
-
     <button id="btn" type="button">Calculer mes frais</button>
-
-    <section id="out" class="out" aria-live="polite">
-      </section>
+    <section id="out" class="out" aria-live="polite"></section>
   </main>
-
   <script src="/app.js"></script>
 </body>
 </html>
