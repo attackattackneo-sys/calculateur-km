@@ -104,7 +104,21 @@
       min-height: 50px;
       font-size: 1.1rem;
     }
+.out.err {
+  border: 1px solid #ff4d4d;
+  background: #fff5f5;
+  color: #d63031;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 20px;
+  animation: shake 0.4s ease-in-out; /* Petit effet pour attirer l'attention */
+}
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
     /* Ces classes sont à utiliser dans ton JS app.js pour styliser le résultat */
     .result-text {
       color: var(--primary-dark);
