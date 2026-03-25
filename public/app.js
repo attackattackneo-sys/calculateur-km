@@ -39,17 +39,26 @@ btn.addEventListener("click", async () => {
 
   try {
     setLoading();
+    
+    // On peut essayer de forcer le pays pour aider l'API
+    const cleanAddress = address.toLowerCase().includes("france") ? address : `${address}, France`;
+
     const res = await fetch("/api/calculate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ address })
+      body: JSON.stringify({ address: cleanAddress })
     });
 
     const data = await res.json();
-    if (!res.ok) return setError(data?.error || "Erreur lors du calcul.");
+    
+    if (!res.ok) {
+        console.error("Détail de l'erreur API:", data); // Pour t'aider à débugger
+        return setError(data?.error || "Adresse introuvable ou itinéraire indisponible.");
+    }
 
     setResult(data);
-  } catch {
+  } catch (err) {
+    console.error("Erreur réseau:", err);
     setError("Service indisponible. Réessaie dans un instant.");
   }
 });
