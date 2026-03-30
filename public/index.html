@@ -3,77 +3,508 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calcul des frais de déplacement | GregPhotographe</title>
+  <title>Frais de déplacement | GregPhotographe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary-dark: #2c3e50;
-      --accent-orange: #ff6600;
-      --hover-orange: #e65c00;
-      --bg-gradient: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-      --glass-bg: rgba(255, 255, 255, 0.95);
+      --primary: #1a1a1a;
+      --orange: #ff6600;
+      --orange-light: rgba(255, 102, 0, 0.08);
+      --orange-glow: rgba(255, 102, 0, 0.25);
+      --bg: #faf8f5;
+      --card: #ffffff;
+      --muted: #888;
+      --border: #ebebeb;
+      --radius: 16px;
     }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg-gradient);
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      /* Subtle linen texture */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23faf8f5'/%3E%3Ccircle cx='1' cy='1' r='0.5' fill='%23e8e4de' opacity='.4'/%3E%3C/svg%3E");
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow:
+        0 1px 2px rgba(0,0,0,0.04),
+        0 8px 32px rgba(0,0,0,0.07),
+        0 0 0 1px rgba(0,0,0,0.03);
+      width: 100%;
+      max-width: 440px;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .card-header {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .card-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--orange), #ff9a44);
+    }
+    .logo-line {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--orange);
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+    h1 span { color: var(--orange); }
+
+    /* ── Body ── */
+    .card-body { padding: 1.75rem 2rem; }
+
+    .field { margin-bottom: 1.25rem; }
+    .field label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .field label .tip {
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: #bbb;
+      font-size: 0.7rem;
+      margin-left: 0.3rem;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--primary);
+      background: #fdfdfd;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px var(--orange-glow);
+      background: #fff;
+    }
+
+    .row { display: flex; gap: 12px; }
+    .row .field { flex: 1; }
+
+    .number-ctrl {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fdfdfd;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .number-ctrl:focus-within {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px var(--orange-glow);
+    }
+    .number-ctrl button {
+      width: 38px;
+      height: 42px;
+      border: none;
+      background: none;
+      font-size: 1.2rem;
+      color: var(--orange);
+      cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      margin: 0; color: var(--primary-dark);
+      transition: background 0.15s;
+      flex-shrink: 0;
     }
-    .wrap {
-      background: var(--glass-bg); padding: 2.5rem;
-      border-radius: 20px; box-shadow: 0 10px 30px rgba(255, 102, 0, 0.1);
-      width: 100%; max-width: 450px; text-align: center;
-      border: 1px solid rgba(255, 102, 0, 0.1);
+    .number-ctrl button:hover { background: var(--orange-light); }
+    .number-ctrl input {
+      flex: 1;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      text-align: center;
+      font-weight: 600;
+      padding: 0;
+      min-width: 0;
+      background: transparent;
     }
-    h1 { font-weight: 300; margin-bottom: 2rem; font-size: 1.8rem; }
-    .input-group { text-align: left; margin-bottom: 1.5rem; }
-    .flex-group { display: flex; gap: 15px; margin-bottom: 1.5rem; }
-    .flex-item { flex: 1; text-align: left; }
-    label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; opacity: 0.8; }
-    input {
-      width: 100%; padding: 12px 15px; border: 2px solid #eee;
-      border-radius: 10px; font-size: 1rem; box-sizing: border-box;
-      transition: all 0.3s ease;
+    .number-ctrl input:focus { box-shadow: none; border-color: transparent; background: transparent; }
+
+    /* ── CTA ── */
+    .btn-calc {
+      width: 100%;
+      padding: 14px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px var(--orange-glow);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    input:focus { outline: none; border-color: var(--accent-orange); box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.2); }
-    button {
-      width: 100%; padding: 15px; background: var(--accent-orange);
-      color: white; border: none; border-radius: 10px; font-size: 1rem;
-      font-weight: bold; cursor: pointer; transition: all 0.3s;
-      box-shadow: 0 4px 6px rgba(255, 102, 0, 0.2);
+    .btn-calc:hover:not(:disabled) {
+      background: #e55c00;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--orange-glow);
     }
-    button:hover { background: var(--hover-orange); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(255, 102, 0, 0.3); }
-    .out { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee; min-height: 50px; font-size: 1.1rem; }
-    .out.ok { border-top: 2px solid var(--accent-orange); background: rgba(255, 102, 0, 0.05); border-radius: 0 0 15px 15px; padding: 1.5rem; animation: fadeIn 0.5s ease; }
-    .out.err { border-top: 2px solid #e74c3c; color: #c0392b; background: #fdf2f2; border-radius: 12px; padding: 15px; animation: fadeIn 0.4s ease; }
-    .result-text { color: var(--primary-dark); margin-bottom: 0.5rem; display: block; font-weight: bold;}
-    .price-tag { font-size: 2.5rem; font-weight: bold; color: var(--accent-orange); display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .btn-calc:active { transform: translateY(0); }
+    .btn-calc:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ── Result ── */
+    #result { overflow: hidden; max-height: 0; transition: max-height 0.4s ease; }
+    #result.visible { max-height: 320px; }
+
+    .result-inner {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem 1.75rem;
+    }
+    .result-inner.ok { background: var(--orange-light); }
+    .result-inner.err {
+      background: #fff5f5;
+      border-top-color: #f5c6c6;
+    }
+
+    .result-city {
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .result-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--orange);
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+    .result-price sup { font-size: 1.4rem; vertical-align: super; }
+    .result-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .result-meta strong { color: var(--primary); }
+    .result-badge {
+      display: inline-block;
+      background: var(--orange);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .result-err-msg {
+      color: #c0392b;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .result-err-msg::before {
+      content: '⚠';
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Loader ── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn-calc.loading .spinner { display: block; }
+    .btn-calc.loading .btn-label { opacity: 0.7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer note ── */
+    .card-note {
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: #bbb;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 480px) {
+      .card-header, .card-body { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .result-inner { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .card-note { padding-left: 1.25rem; padding-right: 1.25rem; }
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Estimation de trajet</h1>
-    
-    <div class="input-group">
+
+<div class="card">
+  <div class="card-header">
+    <p class="logo-line">GregPhotographe &mdash; Studio</p>
+    <h1>Estimation des <span>frais de trajet</span></h1>
+  </div>
+
+  <div class="card-body">
+    <div class="field">
       <label for="address">Lieu de la prestation</label>
-      <input id="address" type="text" placeholder="Ville ou code postal (ex: Melun 77000)..." />
+      <input id="address" type="text" placeholder="Ville ou code postal (ex: Melun 77000)…" autocomplete="off" />
     </div>
 
-    <div class="flex-group">
-      <div class="flex-item">
-        <label for="babies" title="+15 € par bébé (0-3 mois)">Bébés (0-3m)</label>
-        <input id="babies" type="number" min="0" value="0" />
+    <div class="row">
+      <div class="field">
+        <label>Bébés (0-3 mois) <span class="tip">+15 € / bébé</span></label>
+        <div class="number-ctrl">
+          <button type="button" data-target="babies" data-op="minus" aria-label="Moins">−</button>
+          <input id="babies" type="number" min="0" value="0" readonly />
+          <button type="button" data-target="babies" data-op="plus" aria-label="Plus">+</button>
+        </div>
       </div>
-      <div class="flex-item">
-        <label for="ants" title="+5 € par personne">Photos ANTS</label>
-        <input id="ants" type="number" min="0" value="0" />
+      <div class="field">
+        <label>Photos ANTS <span class="tip">+5 € / pers.</span></label>
+        <div class="number-ctrl">
+          <button type="button" data-target="ants" data-op="minus" aria-label="Moins">−</button>
+          <input id="ants" type="number" min="0" value="0" readonly />
+          <button type="button" data-target="ants" data-op="plus" aria-label="Plus">+</button>
+        </div>
       </div>
     </div>
 
-    <button id="btn" type="button">Calculer mes frais</button>
-    <section id="out" class="out" aria-live="polite"></section>
-  </main>
-  <script src="/app.js"></script>
+    <button id="btn" class="btn-calc" type="button">
+      <div class="spinner"></div>
+      <span class="btn-label">Calculer mes frais</span>
+    </button>
+  </div>
+
+  <div id="result" aria-live="polite"></div>
+
+  <p class="card-note">Itinéraire calculé depuis le studio · 16 bd Carnot, Neuilly-sur-Marne</p>
+</div>
+
+<script>
+/* ── Configuration ── */
+const STUDIO_ADDRESS = "16 boulevard Carnot, 93330 Neuilly-sur-Marne, France";
+
+// Villes limitrophes (Zone 1 — tarif 79 €)
+const NEARBY_CITIES = new Set([
+  "noisy-le-grand",
+  "chelles",
+  "neuilly-plaisance",
+  "gagny",
+  "le perreux-sur-marne",
+  "gournay-sur-marne"
+]);
+
+/* ── Calcul du prix ── */
+function round1(n) { return Math.round(n * 10) / 10; }
+
+function computePrice({ city, department, distanceKm, babies, ants }) {
+  const cityN = (city || "").trim().toLowerCase();
+  let base, explanation;
+
+  if (cityN.includes("neuilly-sur-marne")) {
+    base = 59; explanation = "Zone 1 — Neuilly-sur-Marne.";
+  } else if (NEARBY_CITIES.has(cityN)) {
+    base = 79; explanation = "Zone 1 — Ville limitrophe.";
+  } else if (department === "75") {
+    base = 150; explanation = "Zone 4 — Paris (75) intra-muros.";
+  } else if (["93", "94", "77"].includes(department)) {
+    if (distanceKm <= 7) {
+      base = 95; explanation = "Zone 2 — Dpt 93/94/77 (≤ 7 km).";
+    } else {
+      base = 125; explanation = "Zone 3 — Déplacement étendu (> 7 km).";
+      if (distanceKm > 12) {
+        const extraKm = distanceKm - 12;
+        base += extraKm * 3.8;
+        explanation += ` (+ ${round1(extraKm)} km à 3,80 €/km).`;
+      }
+    }
+    base = Math.round(base);
+  } else {
+    return { price: null, explanation: "Hors zone — merci de me contacter directement." };
+  }
+
+  // Suppléments
+  const babyExtra = (babies || 0) * 15;
+  const antExtra  = (ants  || 0) * 5;
+  const extras = [];
+  if (babyExtra) extras.push(`+${babyExtra} € bébé${babies > 1 ? "s" : ""}`);
+  if (antExtra)  extras.push(`+${antExtra} € ANTS`);
+
+  const total = base + babyExtra + antExtra;
+  const extrasLabel = extras.length ? extras.join(", ") : null;
+
+  return { price: total, basePrice: base, extrasLabel, explanation };
+}
+
+/* ── Géocodage via Nominatim ── */
+async function geocode(address) {
+  const url = new URL("https://nominatim.openstreetmap.org/search");
+  url.searchParams.set("q", address.includes("France") ? address : `${address}, France`);
+  url.searchParams.set("format", "json");
+  url.searchParams.set("addressdetails", "1");
+  url.searchParams.set("limit", "1");
+  url.searchParams.set("countrycodes", "fr");
+
+  const r = await fetch(url.toString(), {
+    headers: { "User-Agent": "GregPhotographe-km-calculator/1.1" }
+  });
+  const data = await r.json();
+  if (!Array.isArray(data) || !data[0]) throw new Error("Adresse introuvable.");
+
+  const item = data[0];
+  const a = item.address || {};
+  
+  // Correction pour les grandes villes comme Melun
+  const city = a.city || a.town || a.municipality || a.village || a.suburb || a.county || item.name || "";
+  
+  // Correction pour récupérer le code postal à tous les coups
+  let postcode = a.postcode || "";
+  if (!postcode && item.display_name) {
+    const match = item.display_name.match(/\b\d{5}\b/);
+    if (match) postcode = match[0];
+  }
+  const department = postcode.slice(0, 2);
+
+  return { lat: Number(item.lat), lon: Number(item.lon), city, department, postcode };
+}
+
+/* ── Calcul de l'itinéraire via OSRM ── */
+async function routeKm(fromLat, fromLon, toLat, toLon) {
+  const url = `https://router.project-osrm.org/route/v1/driving/${fromLon},${fromLat};${toLon},${toLat}?overview=false`;
+  const r = await fetch(url);
+  const data = await r.json();
+  if (data.code !== "Ok" || !data.routes?.[0]) throw new Error("Itinéraire routier indisponible.");
+  return data.routes[0].distance / 1000; // mètres → km
+}
+
+/* ── UI ── */
+const btn      = document.getElementById("btn");
+const result  = document.getElementById("result");
+const addrEl  = document.getElementById("address");
+const babiesEl = document.getElementById("babies");
+const antsEl   = document.getElementById("ants");
+
+// Contrôles +/−
+document.querySelectorAll(".number-ctrl button").forEach(b => {
+  b.addEventListener("click", () => {
+    const input = document.getElementById(b.dataset.target);
+    const val = parseInt(input.value, 10) || 0;
+    input.value = b.dataset.op === "plus" ? val + 1 : Math.max(0, val - 1);
+  });
+});
+
+// Entrée clavier → calcul
+addrEl.addEventListener("keydown", e => { if (e.key === "Enter") btn.click(); });
+
+function setLoading(on) {
+  btn.disabled = on;
+  btn.classList.toggle("loading", on);
+  btn.querySelector(".btn-label").textContent = on ? "Recherche…" : "Calculer mes frais";
+}
+
+function showResult(html, type) {
+  result.innerHTML = `<div class="result-inner ${type}">${html}</div>`;
+  result.className = "visible";
+}
+
+function showError(msg) {
+  showResult(`<div class="result-err-msg">${msg}</div>`, "err");
+}
+
+btn.addEventListener("click", async () => {
+  const address = addrEl.value.trim();
+  if (!address) { showError("Merci de saisir une adresse ou une ville."); return; }
+
+  const babies = parseInt(babiesEl.value, 10) || 0;
+  const ants   = parseInt(antsEl.value,   10) || 0;
+
+  setLoading(true);
+  result.className = ""; // masquer pendant la recherche
+  result.innerHTML = "";
+
+  try {
+    const [studio, client] = await Promise.all([
+      geocode(STUDIO_ADDRESS),
+      geocode(address)
+    ]);
+
+    const distKmRaw = await routeKm(studio.lat, studio.lon, client.lat, client.lon);
+    const distanceKm = round1(distKmRaw);
+
+    const pricing = computePrice({ city: client.city, department: client.department, distanceKm, babies, ants });
+
+    if (!pricing.price) {
+      showResult(`
+        <p class="result-city">${client.city || address}</p>
+        <p class="result-meta" style="margin-top:.5rem">${pricing.explanation}</p>
+        <p class="result-meta" style="margin-top:.25rem">Distance : ${distanceKm} km</p>
+      `, "ok");
+      return;
+    }
+
+    const extrasHtml = pricing.extrasLabel
+      ? `<br><span class="result-badge">+</span>${pricing.extrasLabel} inclus`
+      : "";
+
+    showResult(`
+      <p class="result-city">${client.city || address}</p>
+      <p class="result-price"><sup>€</sup>${pricing.price}</p>
+      <div class="result-meta">
+        <strong>${distanceKm} km</strong> depuis le studio${extrasHtml}
+        <br><span style="margin-top:.3rem;display:block">${pricing.explanation}</span>
+      </div>
+    `, "ok");
+
+  } catch (err) {
+    showError(err.message || "Adresse introuvable ou service indisponible. Réessaie dans un instant.");
+  } finally {
+    setLoading(false);
+  }
+});
+</script>
 </body>
 </html>
