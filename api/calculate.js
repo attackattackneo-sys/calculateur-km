@@ -1,130 +1,104 @@
 const STUDIO_ADDRESS = "16 boulevard Carnot, 93330 Neuilly-sur-Marne, France";
 
-// A REMPLACER par ta liste finale
 const NEARBY_CITIES = new Set([
-  "Noisy-le-Grand",
-  "Chelles",
-  "Neuilly-Plaisance",
-  "Gagny",
-  "Le Perreux-sur-Marne",
-  "Gournay-sur-Marne"
+  "noisy-le-grand", "chelles", "neuilly-plaisance", "gagny", "le perreux-sur-marne", "gournay-sur-marne"
 ]);
 
-function round1(n) {
-  return Math.round(n * 10) / 10;
-}
+function round1(n) { return Math.round(n * 10) / 10; }
 
-function normalizeCity(s) {
-  return (s || "").trim();
-}
-
-function computePrice({ city, department, distanceKm }) {
+function computePrice({ city, department, distanceKm, babiesCount, antsCount }) {
   const cityN = (city || "").trim().toLowerCase();
+  let basePrice = null;
+  let explanation = "";
   
-  if (cityN.includes("neuilly-sur-marne")) return { price: 59, explanation: "Zone 1 : Neuilly-sur-Marne." };
-  if (NEARBY_CITIES.has(cityN)) return { price: 79, explanation: "Zone 1 : Ville limitrophe." };
-  if (department === "75") return { price: 150, explanation: "Zone 4 : Paris (75) intra-muros." };
-
-  if (["93", "94", "77"].includes(department)) {
-    if (distanceKm <= 7) return { price: 95, explanation: "Zone 2 : Dpt 93/94/77 (≤ 7 km)." };
-    
-    let price = 125;
-    let explanation = "Zone 3 : Déplacement étendu (> 7 km).";
-    if (distanceKm > 12) {
-      const extraKm = distanceKm - 12;
-      price += extraKm * 3.8;
-      explanation += ` (+ ${round1(extraKm)} km à 3,80 €/km).`;
+  if (cityN.includes("neuilly-sur-marne")) {
+    basePrice = 59; explanation = "Zone 1 : Neuilly-sur-Marne.";
+  } else if (NEARBY_CITIES.has(cityN)) {
+    basePrice = 79; explanation = "Zone 1 : Ville limitrophe.";
+  } else if (department === "75") {
+    basePrice = 150; explanation = "Zone 4 : Paris (75) intra-muros.";
+  } else if (["93", "94", "77"].includes(department)) {
+    if (distanceKm <= 7) {
+      basePrice = 95; explanation = "Zone 2 : Dpt 93/94/77 (≤ 7 km).";
+    } else {
+      basePrice = 125;
+      explanation = "Zone 3 : Déplacement étendu (> 7 km).";
+      if (distanceKm > 12) {
+        const extraKm = distanceKm - 12;
+        basePrice += extraKm * 3.8;
+        explanation += ` (+ ${round1(extraKm)} km à 3,80 €/km).`;
+      }
     }
-    return { price: Math.round(price), explanation };
   }
-  return { price: "Sur devis", explanation: "Hors zone : merci de me contacter." };
+
+  if (basePrice === null) {
+    return { price: "Sur devis", explanation: "Hors zone : merci de me contacter." };
+  }
+
+  // Ajout des suppléments
+  const extraBabies = babiesCount * 15;
+  const extraAnts = antsCount * 5;
+  const finalPrice = Math.round(basePrice) + extraBabies + extraAnts;
+
+  if (extraBabies > 0) explanation += ` | +${extraBabies}€ (Bébés)`;
+  if (extraAnts > 0) explanation += ` | +${extraAnts}€ (ANTS)`;
+
+  return { price: finalPrice, explanation };
 }
 
-async function geocodeNominatim(address) {
-  const url = new URL("https://nominatim.openstreetmap.org/search");
-  url.searchParams.set("q", `${address}, France`);
-  url.searchParams.set("format", "json");
-  url.searchParams.set("addressdetails", "1");
-  url.searchParams.set("limit", "1");
-  url.searchParams.set("countrycodes", "fr");
-
-  const r = await fetch(url.toString(), {
-    headers: { "User-Agent": "km-calculator/1.0 (contact: you@example.com)" }
-  });
+async function geocode(address) {
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&addressdetails=1&limit=1&countrycodes=fr`;
+  const r = await fetch(url, { headers: { "User-Agent": "GregPhotographe-App/1.0" } });
   const j = await r.json();
-  if (!Array.isArray(j) || !j[0]) throw new Error("Geocode failed");
+  if (!j || !j[0]) throw new Error(`Impossible de trouver la ville : ${address}`);
 
   const item = j[0];
   const a = item.address || {};
-
-  const city =
-    a.city ||
-    a.town ||
-    a.village ||
-    a.municipality ||
-    a.county ||
-    "";
-
-  const postcode = a.postcode || "";
+  const city = a.city || a.town || a.municipality || a.village || item.name || "Ville inconnue";
+  
+  let postcode = a.postcode || "";
+  if (!postcode) {
+    const match = item.display_name.match(/\b\d{5}\b/);
+    if (match) postcode = match[0];
+  }
   const department = postcode.slice(0, 2);
 
-  return {
-    lat: Number(item.lat),
-    lon: Number(item.lon),
-    city,
-    department
-  };
-}
-
-async function routeDistanceOsrmKm(fromLat, fromLon, toLat, toLon) {
-  const url = new URL(`https://router.project-osrm.org/route/v1/driving/${fromLon},${fromLat};${toLon},${toLat}`);
-  url.searchParams.set("overview", "false");
-
-  const r = await fetch(url.toString());
-  const j = await r.json();
-  if (j.code !== "Ok" || !j.routes?.[0]) throw new Error("Route failed");
-
-  const meters = j.routes[0].distance;
-  return meters / 1000;
+  return { lat: item.lat, lon: item.lon, city, department };
 }
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-
+  
   try {
-    const { address } = req.body || {};
-    if (!address || typeof address !== "string") {
-      return res.status(400).json({ error: "Adresse invalide." });
+    const { address, babiesCount = 0, antsCount = 0 } = req.body;
+    if (!address) throw new Error("Veuillez saisir une adresse.");
+
+    const [studio, client] = await Promise.all([geocode(STUDIO_ADDRESS), geocode(address)]);
+    
+    const routeUrl = `https://router.project-osrm.org/route/v1/driving/${studio.lon},${studio.lat};${client.lon},${client.lat}?overview=false`;
+    const routeRes = await fetch(routeUrl);
+    const routeData = await routeRes.json();
+    
+    if (routeData.code !== "Ok" || !routeData.routes || !routeData.routes[0]) {
+      throw new Error("Itinéraire routier introuvable vers cette destination.");
     }
 
-    const studio = await geocodeNominatim(STUDIO_ADDRESS);
-    const client = await geocodeNominatim(address);
-
-    const distanceKmRaw = await routeDistanceOsrmKm(studio.lat, studio.lon, client.lat, client.lon);
-    const distanceKm = round1(distanceKmRaw);
-
-    const pricing = computePrice({
-      city: client.city,
-      department: client.department,
-      distanceKm
+    const distanceKm = round1(routeData.routes[0].distance / 1000);
+    const pricing = computePrice({ 
+      city: client.city, 
+      department: client.department, 
+      distanceKm,
+      babiesCount,
+      antsCount
     });
 
-    if (pricing.price === null) {
-      return res.status(200).json({
-        cityLabel: client.city || "Adresse",
-        distanceKm,
-        price: "Sur devis",
-        explanation: pricing.explanation
-      });
-    }
-
-    return res.status(200).json({
-      cityLabel: client.city || "Adresse",
+    res.status(200).json({
+      cityLabel: client.city.charAt(0).toUpperCase() + client.city.slice(1),
       distanceKm,
       price: pricing.price,
       explanation: pricing.explanation
     });
-  } catch {
-    return res.status(400).json({ error: "Adresse introuvable ou itinéraire indisponible." });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 };
