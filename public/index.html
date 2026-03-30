@@ -27,7 +27,9 @@
     }
     h1 { font-weight: 300; margin-bottom: 2rem; font-size: 1.8rem; }
     .input-group { text-align: left; margin-bottom: 1.5rem; }
-    label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; opacity: 0.8; }
+    .flex-group { display: flex; gap: 15px; margin-bottom: 1.5rem; }
+    .flex-item { flex: 1; text-align: left; }
+    label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; opacity: 0.8; }
     input {
       width: 100%; padding: 12px 15px; border: 2px solid #eee;
       border-radius: 10px; font-size: 1rem; box-sizing: border-box;
@@ -52,10 +54,23 @@
 <body>
   <main class="wrap">
     <h1>Estimation de trajet</h1>
+    
     <div class="input-group">
       <label for="address">Lieu de la prestation</label>
       <input id="address" type="text" placeholder="Ville ou code postal (ex: Melun 77000)..." />
     </div>
+
+    <div class="flex-group">
+      <div class="flex-item">
+        <label for="babies" title="+15 € par bébé (0-3 mois)">Bébés (0-3m)</label>
+        <input id="babies" type="number" min="0" value="0" />
+      </div>
+      <div class="flex-item">
+        <label for="ants" title="+5 € par personne">Photos ANTS</label>
+        <input id="ants" type="number" min="0" value="0" />
+      </div>
+    </div>
+
     <button id="btn" type="button">Calculer mes frais</button>
     <section id="out" class="out" aria-live="polite"></section>
   </main>
