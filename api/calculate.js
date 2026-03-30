@@ -35,7 +35,6 @@ function computePrice({ city, department, distanceKm, babiesCount, antsCount }) 
     return { price: "Sur devis", explanation: "Hors zone : merci de me contacter." };
   }
 
-  // Ajout des suppléments
   const extraBabies = babiesCount * 15;
   const extraAnts = antsCount * 5;
   const finalPrice = Math.round(basePrice) + extraBabies + extraAnts;
@@ -48,7 +47,7 @@ function computePrice({ city, department, distanceKm, babiesCount, antsCount }) 
 
 async function geocode(address) {
   const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&addressdetails=1&limit=1&countrycodes=fr`;
-  const r = await fetch(url, { headers: { "User-Agent": "GregPhotographe-App/1.0" } });
+  const r = await fetch(url, { headers: { "User-Agent": "GregPhotographe-App/1.1" } });
   const j = await r.json();
   if (!j || !j[0]) throw new Error(`Impossible de trouver la ville : ${address}`);
 
