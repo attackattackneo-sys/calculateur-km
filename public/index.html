@@ -1,509 +1,456 @@
 <!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Frais de déplacement | GregPhotographe</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #1a1a1a;
-            --orange: #ff6600;
-            --orange-light: rgba(255, 102, 0, 0.08);
-            --orange-glow: rgba(255, 102, 0, 0.25);
-            --bg: #faf8f5;
-            --card: #ffffff;
-            --muted: #888;
-            --border: #ebebeb;
-            --radius: 16px;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Frais de déplacement | GregPhotographe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a1a1a;
+      --orange: #ff6600;
+      --orange-light: rgba(255, 102, 0, 0.08);
+      --orange-glow: rgba(255, 102, 0, 0.25);
+      --bg: #faf8f5;
+      --card: #ffffff;
+      --muted: #888;
+      --border: #ebebeb;
+      --radius: 16px;
+    }
 
-        *,
-        *::before,
-        *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23faf8f5'/%3E%3Ccircle cx='1' cy='1' r='0.5' fill='%23e8e4de' opacity='.4'/%3E%3C/svg%3E");
-        }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
 
-        .card {
-            background: var(--card);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07);
-            width: 100%;
-            max-width: 480px;
-            overflow: hidden;
-        }
+    .card {
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.07);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+    }
 
-        .card-header {
-            padding: 2rem 2rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-        }
+    .card-header {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .card-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--orange), #ff9a44);
+    }
+    .logo-line {
+      font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--orange); font-weight: 600; margin-bottom: 0.6rem;
+    }
+    h1 { font-family: 'Playfair Display', serif; font-size: 1.65rem; color: var(--primary); }
+    h1 span { color: var(--orange); }
 
-        .card-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--orange), #ff9a44);
-        }
+    .card-body { padding: 1.75rem 2rem; }
 
-        .logo-line {
-            font-size: 0.7rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--orange);
-            font-weight: 600;
-            margin-bottom: 0.6rem;
-        }
+    .field { margin-bottom: 1.25rem; }
+    .field label {
+      display: block; font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem;
+    }
+    .field label .tip { font-weight: 400; text-transform: none; color: #bbb; font-size: 0.7rem; margin-left: 0.3rem; }
+    
+    input[type="text"] {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-family: inherit; font-size: 0.95rem;
+    }
+    input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-glow); }
 
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.65rem;
-            color: var(--primary);
-        }
+    .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
 
-        h1 span { color: var(--orange); }
+    .number-ctrl {
+      display: flex; align-items: center; border: 1.5px solid var(--border);
+      border-radius: 10px; overflow: hidden; background: #fdfdfd;
+    }
+    .number-ctrl button {
+      width: 38px; height: 42px; border: none; background: none;
+      color: var(--orange); cursor: pointer; font-size: 1.2rem;
+    }
+    .number-ctrl input {
+      flex: 1; border: none; text-align: center; font-weight: 600; width: 30px;
+    }
 
-        .card-body { padding: 1.75rem 2rem; }
+    .btn-calc {
+      width: 100%; padding: 14px; background: var(--orange); color: #fff;
+      border: none; border-radius: 12px; font-weight: 600; cursor: pointer;
+      box-shadow: 0 4px 14px var(--orange-glow);
+    }
+    .btn-calc:hover { background: #e55c00; transform: translateY(-1px); }
 
-        .field { margin-bottom: 1.25rem; }
-
-        .field label {
-            display: block;
-            font-size: 0.72rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 0.5rem;
-        }
-
-        .field label .tip {
-            font-weight: 400;
-            text-transform: none;
-            color: #bbb;
-            font-size: 0.7rem;
-            margin-left: 0.3rem;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--orange);
-            box-shadow: 0 0 0 3px var(--orange-glow);
-        }
-
-        .row-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 1.25rem;
-        }
-
-        .number-ctrl {
-            display: flex;
-            align-items: center;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            background: #fdfdfd;
-        }
-
-        .number-ctrl button {
-            width: 38px;
-            height: 42px;
-            border: none;
-            background: none;
-            color: var(--orange);
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .number-ctrl input {
-            flex: 1;
-            border: none;
-            text-align: center;
-            font-weight: 600;
-            width: 30px;
-        }
-
-        .btn-calc {
-            width: 100%;
-            padding: 14px;
-            background: var(--orange);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 14px var(--orange-glow);
-        }
-
-        .btn-calc:hover {
-            background: #e55c00;
-            transform: translateY(-1px);
-        }
-
-        #result {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.4s ease;
-        }
-
-        #result.visible { max-height: 600px; }
-
-        .result-inner {
-            border-top: 1px solid var(--border);
-            padding: 1.5rem 2rem;
-        }
-
-        .result-inner.ok { background: var(--orange-light); }
-
-        .result-price {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--orange);
-        }
-
-        .result-meta {
-            font-size: 0.82rem;
-            color: var(--muted);
-            line-height: 1.5;
-            margin-top: 8px;
-        }
-
-        .card-note {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.72rem;
-            color: #bbb;
-            text-align: center;
-        }
-    </style>
+    #result { overflow: hidden; max-height: 0; transition: max-height 0.4s ease; }
+    #result.visible { max-height: 600px; }
+    .result-inner { border-top: 1px solid var(--border); padding: 1.5rem 2rem; }
+    .result-inner.ok { background: var(--orange-light); }
+    .result-price { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: var(--orange); }
+    .result-meta { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-top: 8px; }
+    
+    .card-note { padding: 1rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: #bbb; text-align: center; }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <div class="card-header">
-            <p class="logo-line">GregPhotographe &mdash; Studio</p>
-            <h1>Estimation des <span>frais</span></h1>
-        </div>
 
-        <div class="card-body">
-            <div class="field">
-                <label for="address">Lieu de la prestation</label>
-                <input id="address" type="text" placeholder="Ville ou code postal…" />
-            </div>
+<div class="card">
+  <div class="card-header">
+    <p class="logo-line">GregPhotographe &mdash; Studio</p>
+    <h1>Estimation des <span>frais</span></h1>
+  </div>
 
-            <div class="row-grid">
-                <div class="field">
-                    <label>Bébés (0-3m) <span class="tip">+<span id="babyUnitPrice">15</span>€</span></label>
-                    <div class="number-ctrl">
-                        <button type="button" data-target="babies" data-op="minus">−</button>
-                        <input id="babies" type="number" value="0" readonly />
-                        <button type="button" data-target="babies" data-op="plus">+</button>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Pers. sup. <span class="tip">+<span id="persUnitPrice">15</span>€</span></label>
-                    <div class="number-ctrl">
-                        <button type="button" data-target="persons" data-op="minus">−</button>
-                        <input id="persons" type="number" value="0" readonly />
-                        <button type="button" data-target="persons" data-op="plus">+</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="field">
-                <label>Photos ANTS <span class="tip">+<span id="antsUnitPrice">5</span>€ / pers.</span></label>
-                <div class="number-ctrl">
-                    <button type="button" data-target="ants" data-op="minus">−</button>
-                    <input id="ants" type="number" value="0" readonly />
-                    <button type="button" data-target="ants" data-op="plus">+</button>
-                </div>
-            </div>
-
-            <button id="btn" class="btn-calc">Calculer mes frais</button>
-        </div>
-
-        <div id="result"></div>
-        <p class="card-note">Tarifs basés sur le code postal ou la zone de déplacement</p>
+  <div class="card-body">
+    <div class="field">
+      <label for="address">Lieu de la prestation</label>
+      <input id="address" type="text" placeholder="Ville ou code postal…" />
     </div>
 
-    <script>
-        // =================== DICTIONNAIRE VILLES → CODE POSTAL ===================
-        // Ajoutez ici toutes les communes que vous voulez reconnaître
-        const CITY_POSTCODE = {
-            "melun": "77000",
-            "paris": "75000",
-            "evry": "91000",
-            "nanterre": "92000",
-            "creteil": "94000",
-            "noisy-le-grand": "93160",
-            "chelles": "77500",
-            "neuilly-sur-marne": "93330",
-            "gagny": "93220",
-            "le perreux-sur-marne": "94170",
-            "gournay-sur-marne": "93460",
-            "bagnolet": "93170",
-            "montreuil": "93100",
-            "saint-denis": "93200",
-            "aubervilliers": "93300",
-            "aubay-sous-bois": "93600",
-            "bobigny": "93000",
-            "drancy": "93700",
-            "le raincy": "93340",
-            "livry-gargan": "93190",
-            "clichy-sous-bois": "93390",
-            "montfermeil": "93370",
-            "neuilly-plaisance": "93360",
-            "noisy-le-sec": "93130",
-            "pantin": "93500",
-            "les pavillons-sous-bois": "93320",
-            "romainville": "93230",
-            "rosny-sous-bois": "93110",
-            "villemomble": "93250",
-            "villetaneuse": "93430",
-            "tremblay-en-france": "93290",
-            "bondy": "93140",
-            "le bourget": "93350",
-            "la courneuve": "93120",
-            "argenteuil": "95100",
-            "cergy": "95000",
-            "saint-germain-en-laye": "78100",
-            "versailles": "78000",
-            "etampes": "91150",
-            "corbeil-essonnes": "91100",
-            "juvisy-sur-orge": "91260",
-            "longjumeau": "91160",
-            "palaiseau": "91120",
-            "sainte-genevieve-des-bois": "91700",
-            "vitry-sur-seine": "94400",
-            "ivry-sur-seine": "94200",
-            "charenton-le-pont": "94220",
-            "fontenay-sous-bois": "94120",
-            "nogent-sur-marne": "94130",
-            "saint-maur-des-fosses": "94100",
-            "vincennes": "94300",
-            "alesia": "75014",
-            // Ajoutez d'autres villes si nécessaire
-        };
+    <div class="row-grid">
+      <div class="field">
+        <label>Bébés (0-3m) <span class="tip">+<span id="babyUnitPrice">15</span>€</span></label>
+        <div class="number-ctrl">
+          <button type="button" data-target="babies" data-op="minus">−</button>
+          <input id="babies" type="number" value="0" readonly />
+          <button type="button" data-target="babies" data-op="plus">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Pers. sup. <span class="tip">+<span id="persUnitPrice">15</span>€</span></label>
+        <div class="number-ctrl">
+          <button type="button" data-target="persons" data-op="minus">−</button>
+          <input id="persons" type="number" value="0" readonly />
+          <button type="button" data-target="persons" data-op="plus">+</button>
+        </div>
+      </div>
+    </div>
 
-        // Configuration lue depuis localStorage (mise à jour automatique)
-        function getConfig() {
-            const saved = localStorage.getItem('gregPricingV2');
-            if (saved) {
-                try {
-                    const cfg = JSON.parse(saved);
-                    console.log('✅ Config chargée depuis localStorage', cfg);
-                    return cfg;
-                } catch (e) {
-                    console.error('Erreur parsing config', e);
-                }
-            }
-            console.warn('⚠️ Aucune config trouvée, fallback utilisé');
-            // Fallback par défaut (identique à l'admin)
-            return {
-                priceStudio: 59,
-                localMaxKm: 8,
-                localMaxMin: 15,
-                priceLocal: 79,
-                localExtraKmPrice: 2.5,
-                localExtraMinPrice: 1.5,
-                metroMaxKm: 10,
-                metroMaxMin: 25,
-                priceMetro: 129,
-                metroExtraKmPrice: 2.5,
-                metroExtraMinPrice: 1.5,
-                extendedMaxKm: 12,
-                extendedMaxMin: 45,
-                priceExtended: 179,
-                parisSupplement: 35,
-                extendedExtraKmPrice: 1.5,
-                extendedExtraMinPrice: 1.5,
-                priceBaby: 15,
-                priceExtraPers: 15,
-                priceAnts: 5,
-                postalPrices: {}
-            };
+    <div class="field">
+      <label>Photos ANTS <span class="tip">+<span id="antsUnitPrice">5</span>€ / pers.</span></label>
+      <div class="number-ctrl">
+        <button type="button" data-target="ants" data-op="minus">−</button>
+        <input id="ants" type="number" value="0" readonly />
+        <button type="button" data-target="ants" data-op="plus">+</button>
+      </div>
+    </div>
+
+    <button id="btn" class="btn-calc">Calculer mes frais</button>
+  </div>
+
+  <div id="result"></div>
+  <p class="card-note">Itinéraire calculé depuis le studio à Neuilly-sur-Marne</p>
+</div>
+
+<script>
+  // ----- STUDIO (coordonnées exactes) -----
+  const STUDIO_POSITION = { lat: 48.8582, lon: 2.5286 };
+
+  // ----- CONFIGURATION (depuis localStorage) -----
+  function getConfig() {
+    const saved = localStorage.getItem('gregPricingV2');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    // Fallback (valeurs identiques à votre admin actuelle)
+    return {
+      priceStudio: 59,
+      localMaxKm: 8, localMaxMin: 15, priceLocal: 79,
+      localExtraKmPrice: 2.5, localExtraMinPrice: 1.5,
+      metroMaxKm: 10, metroMaxMin: 25, priceMetro: 129,
+      metroExtraKmPrice: 2.5, metroExtraMinPrice: 1.5,
+      extendedMaxKm: 12, extendedMaxMin: 45, priceExtended: 179,
+      parisSupplement: 35,
+      extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1.5,
+      priceBaby: 15, priceExtraPers: 15, priceAnts: 5,
+      postalPrices: {}
+    };
+  }
+
+  function updateUIPrices() {
+    const cfg = getConfig();
+    document.getElementById('babyUnitPrice').textContent = cfg.priceBaby;
+    document.getElementById('persUnitPrice').textContent = cfg.priceExtraPers;
+    document.getElementById('antsUnitPrice').textContent = cfg.priceAnts;
+  }
+
+  window.addEventListener('load', updateUIPrices);
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'gregPricingV2') updateUIPrices();
+  });
+
+  // ----- GÉOCODAGE (Nominatim avec fallback code postal) -----
+  const CITY_POSTCODE = {
+    "melun": "77000", "paris": "75000", "evry": "91000", "nanterre": "92000",
+    "creteil": "94000", "noisy-le-grand": "93160", "chelles": "77500",
+    "neuilly-sur-marne": "93330", "gagny": "93220", "le perreux-sur-marne": "94170",
+    "gournay-sur-marne": "93460", "bagnolet": "93170", "montreuil": "93100",
+    "saint-denis": "93200", "tremblay-en-france": "93290", "bondy": "93140",
+    "aubay-sous-bois": "93600", "bobigny": "93000", "drancy": "93700",
+    "le raincy": "93340", "livry-gargan": "93190", "montfermeil": "93370",
+    "neuilly-plaisance": "93360", "noisy-le-sec": "93130", "pantin": "93500",
+    "rosny-sous-bois": "93110", "villemomble": "93250", "vincennes": "94300",
+    "saint-maur-des-fosses": "94100", "ivry-sur-seine": "94200", "vitry-sur-seine": "94400",
+    // complétez selon vos besoins
+  };
+
+  async function geocode(address) {
+    // 1. Essayer Nominatim
+    try {
+      const url = new URL("https://nominatim.openstreetmap.org/search");
+      url.searchParams.set("q", `${address}, France`);
+      url.searchParams.set("format", "json");
+      url.searchParams.set("addressdetails", "1");
+      url.searchParams.set("limit", "1");
+      url.searchParams.set("countrycodes", "fr");
+      const r = await fetch(url.toString(), {
+        headers: { "User-Agent": "GregPhotographe-km-calculator/1.0" }
+      });
+      if (r.ok) {
+        const data = await r.json();
+        if (Array.isArray(data) && data[0]) {
+          const a = data[0].address || {};
+          return {
+            lat: Number(data[0].lat),
+            lon: Number(data[0].lon),
+            city: a.city || a.town || a.village || "",
+            department: (a.postcode || "").slice(0, 2),
+            postcode: a.postcode || ""
+          };
         }
+      }
+    } catch (e) {
+      console.warn("Nominatim indisponible, fallback");
+    }
 
-        // Mise à jour des prix affichés dans les labels
-        function updateUIPrices() {
-            const cfg = getConfig();
-            document.getElementById('babyUnitPrice').textContent = cfg.priceBaby;
-            document.getElementById('persUnitPrice').textContent = cfg.priceExtraPers;
-            document.getElementById('antsUnitPrice').textContent = cfg.priceAnts;
+    // 2. Fallback : trouver un code postal
+    const cleaned = address.trim().toLowerCase();
+    let postcode = null;
+    // extraire 5 chiffres
+    const match = cleaned.match(/\b(\d{5})\b/);
+    if (match) postcode = match[1];
+    else {
+      // chercher dans la table ville -> CP
+      for (const [city, cp] of Object.entries(CITY_POSTCODE)) {
+        if (cleaned.includes(city)) {
+          postcode = cp;
+          break;
         }
+      }
+    }
+    if (!postcode) throw new Error("Adresse introuvable");
+    const dept = postcode.slice(0, 2);
+    const deptCenter = {
+      "75": { lat: 48.8566, lon: 2.3522 },
+      "77": { lat: 48.5399, lon: 2.6595 },
+      "78": { lat: 48.8014, lon: 2.1303 },
+      "91": { lat: 48.5839, lon: 2.3081 },
+      "92": { lat: 48.8924, lon: 2.2153 },
+      "93": { lat: 48.9316, lon: 2.3976 },
+      "94": { lat: 48.7846, lon: 2.4238 },
+      "95": { lat: 49.0375, lon: 2.0749 }
+    };
+    if (deptCenter[dept]) {
+      return {
+        lat: deptCenter[dept].lat,
+        lon: deptCenter[dept].lon,
+        city: postcode,
+        department: dept,
+        postcode: postcode,
+        approximate: true
+      };
+    }
+    throw new Error("Département inconnu");
+  }
 
-        // Écoute des modifications inter-onglets
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'gregPricingV2') {
-                console.log('🔄 Changement détecté depuis un autre onglet');
-                updateUIPrices();
-            }
-        });
+  // ----- ROUTAGE : OpenRouteService ou vol d'oiseau -----
+  async function routeORS(fromLat, fromLon, toLat, toLon) {
+    const body = { coordinates: [[fromLon, fromLat], [toLon, toLat]], format: "json" };
+    const url = "https://api.openrouteservice.org/v2/directions/driving-car";
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const r = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Authorization": "5b3ce3597851110001cf6248",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      if (!r.ok) throw new Error("ORS indisponible");
+      const data = await r.json();
+      if (!data.routes || !data.routes[0]) throw new Error("Itinéraire introuvable");
+      const distanceKm = data.routes[0].summary.distance / 1000;
+      const durationMin = data.routes[0].summary.duration / 60;
+      return { distanceKm: Math.round(distanceKm * 10) / 10, durationMinSimple: Math.round(durationMin * 10) / 10 };
+    } catch (e) {
+      console.warn("ORS échoue, vol d'oiseau", e);
+      // vol d'oiseau
+      const R = 6371;
+      const dLat = (toLat - fromLat) * Math.PI / 180;
+      const dLon = (toLon - fromLon) * Math.PI / 180;
+      const a = Math.sin(dLat/2) ** 2 + Math.cos(fromLat * Math.PI / 180) * Math.cos(toLat * Math.PI / 180) * Math.sin(dLon/2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const dist = R * c * 1.3; // facteur correctif
+      const time = (dist / 35) * 60; // 35 km/h moyen
+      return { distanceKm: Math.round(dist * 10) / 10, durationMinSimple: Math.round(time * 10) / 10, approximate: true };
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
 
-        window.addEventListener('load', updateUIPrices);
+  // ----- CALCUL DU PRIX -----
+  function computePrice(distanceKm, durationMinSimple, department, city) {
+    const cfg = getConfig();
+    const lower = (city || "").trim().toLowerCase();
+    const durationAR = durationMinSimple * 2;
 
-        // Extraction du code postal (5 chiffres) ou recherche dans le dictionnaire ville
-        function extractPostcode(text) {
-            const cleaned = text.trim().toLowerCase();
-            // 1. Cherche un code postal (5 chiffres)
-            const match = cleaned.match(/\b(\d{5})\b/);
-            if (match) return match[1];
-            // 2. Cherche dans le dictionnaire ville
-            for (const [city, postcode] of Object.entries(CITY_POSTCODE)) {
-                if (cleaned.includes(city)) {
-                    return postcode;
-                }
-            }
-            return null;
-        }
+    // Priorité 1 : tarif direct code postal (si défini dans l'admin)
+    if (city && cfg.postalPrices && cfg.postalPrices[city]) {
+      return {
+        price: cfg.postalPrices[city],
+        zone: "Tarif direct",
+        details: [`Tarif direct pour le code postal ${city} : ${cfg.postalPrices[city]} €`]
+      };
+    }
 
-        // Calcul du prix de déplacement (sans API)
-        function calculateShipping(cityOrCode) {
-            const cfg = getConfig();
-            const input = cityOrCode.trim().toLowerCase();
-            const postcode = extractPostcode(input);
-            let price = null;
-            let explanation = '';
+    // Neuilly-sur-Marne
+    if (lower.includes("neuilly-sur-marne") || city === "93330") {
+      return {
+        price: cfg.priceStudio,
+        zone: "Studio (Neuilly-sur-Marne)",
+        details: [`Forfait spécial Studio : ${cfg.priceStudio} €`]
+      };
+    }
 
-            // 1. Tarif direct par code postal (défini dans l'admin)
-            if (postcode && cfg.postalPrices && cfg.postalPrices[postcode] !== undefined) {
-                price = cfg.postalPrices[postcode];
-                explanation = `Tarif direct pour le code postal ${postcode}`;
-                return { price, explanation };
-            }
+    let zone, basePrice, includedKm, includedMin, extraKmPrice, extraMinPrice;
+    let parisSurcharge = 0;
 
-            // 2. Neuilly-sur-Marne (code postal ou nom)
-            if (input.includes('neuilly-sur-marne') || input === '93330') {
-                price = cfg.priceStudio;
-                explanation = 'Studio (Neuilly-sur-Marne)';
-                return { price, explanation };
-            }
+    if (distanceKm <= cfg.localMaxKm && durationAR <= cfg.localMaxMin) {
+      zone = "Locale";
+      basePrice = cfg.priceLocal;
+      includedKm = cfg.localMaxKm;
+      includedMin = cfg.localMaxMin;
+      extraKmPrice = cfg.localExtraKmPrice;
+      extraMinPrice = cfg.localExtraMinPrice;
+    } else if (distanceKm <= cfg.metroMaxKm && durationAR <= cfg.metroMaxMin) {
+      zone = "Métropolitaine";
+      basePrice = cfg.priceMetro;
+      includedKm = cfg.metroMaxKm;
+      includedMin = cfg.metroMaxMin;
+      extraKmPrice = cfg.metroExtraKmPrice;
+      extraMinPrice = cfg.metroExtraMinPrice;
+    } else {
+      zone = "Étendue";
+      basePrice = cfg.priceExtended;
+      includedKm = cfg.extendedMaxKm;
+      includedMin = cfg.extendedMaxMin;
+      extraKmPrice = cfg.extendedExtraKmPrice;
+      extraMinPrice = cfg.extendedExtraMinPrice;
+      if (department === "75") parisSurcharge = cfg.parisSupplement;
+    }
 
-            // 3. Détermination du département
-            let dept = null;
-            if (postcode) {
-                dept = postcode.substring(0, 2);
-            } else {
-                // Fallback : tenter de deviner le département via le nom
-                const deptMap = {
-                    'paris': '75',
-                    'seine-saint-denis': '93',
-                    'val-de-marne': '94',
-                    'essonne': '91',
-                    'hauts-de-seine': '92',
-                    'yvelines': '78',
-                    'seine-et-marne': '77',
-                    'val-d\'oise': '95'
-                };
-                for (const [key, value] of Object.entries(deptMap)) {
-                    if (input.includes(key)) {
-                        dept = value;
-                        break;
-                    }
-                }
-            }
+    const excessKm = Math.max(0, distanceKm - includedKm);
+    const excessMin = Math.max(0, durationAR - includedMin);
+    const kmCost = Math.round(excessKm * extraKmPrice * 10) / 10;
+    const minCost = Math.round(excessMin * extraMinPrice * 10) / 10;
+    const total = Math.round(basePrice + kmCost + minCost + parisSurcharge);
 
-            // 4. Application de la grille zonale selon le département
-            if (dept) {
-                let zone = 'locale';
-                if (dept === '75' || dept === '92' || dept === '78' || dept === '91' || dept === '95') {
-                    zone = 'etendue';
-                } else if (dept === '77' || dept === '93' || dept === '94') {
-                    zone = 'metro';
-                }
+    const details = [];
+    details.push(`Zone ${zone} — ${basePrice} €`);
+    if (excessKm > 0) details.push(`+ ${excessKm.toFixed(1)} km × ${extraKmPrice} € = ${kmCost.toFixed(1)} €`);
+    if (excessMin > 0) details.push(`+ ${excessMin.toFixed(1)} min (A/R) × ${extraMinPrice} € = ${minCost.toFixed(1)} €`);
+    if (parisSurcharge > 0) details.push(`Supplément Paris intra-muros : +${parisSurcharge} €`);
 
-                if (zone === 'local') {
-                    price = cfg.priceLocal;
-                    explanation = 'Zone Locale (estimation)';
-                } else if (zone === 'metro') {
-                    price = cfg.priceMetro;
-                    explanation = 'Zone Métropolitaine (estimation)';
-                } else {
-                    price = cfg.priceExtended;
-                    explanation = 'Zone Étendue (estimation)';
-                    if (dept === '75') {
-                        price += cfg.parisSupplement;
-                        explanation += ' + supplément Paris';
-                    }
-                }
-                return { price, explanation };
-            }
+    return { price: total, zone, details };
+  }
 
-            // Si on arrive ici, rien trouvé
-            return null;
-        }
+  // ----- UI -----
+  const btn = document.getElementById("btn");
+  const resultDiv = document.getElementById("result");
 
-        const btn = document.getElementById('btn');
-        const resultDiv = document.getElementById('result');
+  document.querySelectorAll(".number-ctrl button").forEach(b => {
+    b.addEventListener("click", () => {
+      const input = document.getElementById(b.dataset.target);
+      let v = parseInt(input.value) || 0;
+      input.value = b.dataset.op === "plus" ? v + 1 : Math.max(0, v - 1);
+    });
+  });
 
-        document.querySelectorAll('.number-ctrl button').forEach(b => {
-            b.addEventListener('click', () => {
-                const input = document.getElementById(b.dataset.target);
-                let v = parseInt(input.value) || 0;
-                input.value = b.dataset.op === 'plus' ? v + 1 : Math.max(0, v - 1);
-            });
-        });
+  function showResult(html, type) {
+    resultDiv.innerHTML = `<div class="result-inner ${type}">${html}</div>`;
+    resultDiv.className = "visible";
+  }
 
-        function showResult(html, type) {
-            resultDiv.innerHTML = `<div class="result-inner ${type}">${html}</div>`;
-            resultDiv.className = 'visible';
-        }
+  btn.addEventListener("click", async () => {
+    const address = document.getElementById("address").value.trim();
+    if (!address) return showResult(`<p style="color:#c0392b;">⚠ Veuillez entrer une ville ou un code postal.</p>`, "err");
+    
+    btn.textContent = "Calcul en cours…"; btn.disabled = true;
+    try {
+      // Géocodage
+      const clientGeo = await geocode(address);
+      if (!clientGeo) throw new Error("Adresse introuvable");
 
-        btn.addEventListener('click', () => {
-            const address = document.getElementById('address').value.trim();
-            if (!address) {
-                return showResult(`<p style="color:#c0392b;">⚠ Veuillez entrer une ville ou un code postal.</p>`, 'err');
-            }
+      // Routage
+      const route = await routeORS(STUDIO_POSITION.lat, STUDIO_POSITION.lon, clientGeo.lat, clientGeo.lon);
+      const distanceKm = route.distanceKm;
+      const durationSimple = route.durationMinSimple;
+      const durationAR = durationSimple * 2;
 
-            const shipping = calculateShipping(address);
-            if (!shipping || shipping.price === null || shipping.price === undefined) {
-                return showResult(`<p style="color:#c0392b;">⚠ Ville ou code postal non reconnu. Merci d'utiliser le code postal à 5 chiffres (ex: 77000 pour Melun) ou de contacter Greg pour un devis.</p>`, 'err');
-            }
+      // Calcul prix
+      const pricing = computePrice(distanceKm, durationSimple, clientGeo.department, clientGeo.postcode || clientGeo.city);
+      const cfg = getConfig();
+      const babies = parseInt(document.getElementById("babies").value) || 0;
+      const persons = parseInt(document.getElementById("persons").value) || 0;
+      const ants = parseInt(document.getElementById("ants").value) || 0;
 
-            const cfg = getConfig();
-            const babies = parseInt(document.getElementById('babies').value) || 0;
-            const persons = parseInt(document.getElementById('persons').value) || 0;
-            const ants = parseInt(document.getElementById('ants').value) || 0;
+      const babyCost = babies * cfg.priceBaby;
+      const persCost = persons * cfg.priceExtraPers;
+      const antsCost = ants * cfg.priceAnts;
+      const grandTotal = pricing.price + babyCost + persCost + antsCost;
 
-            const babyCost = babies * cfg.priceBaby;
-            const persCost = persons * cfg.priceExtraPers;
-            const antsCost = ants * cfg.priceAnts;
-            const total = shipping.price + babyCost + persCost + antsCost;
+      let detailsHtml = pricing.details.map(d => `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>${d}</span></div>`).join('');
+      if (babyCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Supplément Bébé (${babies})</span><span>${babyCost} €</span></div>`;
+      if (persCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Pers. sup. (${persons})</span><span>${persCost} €</span></div>`;
+      if (antsCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Photos ANTS (${ants})</span><span>${antsCost} €</span></div>`;
 
-            let details = `<div style="display:flex; justify-content:space-between;"><span>${shipping.explanation}</span><span>${shipping.price} €</span></div>`;
-            if (babyCost) details += `<div style="display:flex; justify-content:space-between;"><span>Supplément Bébé (×${babies})</span><span>${babyCost} €</span></div>`;
-            if (persCost) details += `<div style="display:flex; justify-content:space-between;"><span>Pers. sup. (×${persons})</span><span>${persCost} €</span></div>`;
-            if (antsCost) details += `<div style="display:flex; justify-content:space-between;"><span>Photos ANTS (×${ants})</span><span>${antsCost} €</span></div>`;
+      // Indication si approximation
+      let approxNote = "";
+      if (route.approximate || clientGeo.approximate) {
+        approxNote = `<div class="result-meta" style="font-style:italic; margin-top:10px;">⚠ Trajet approximatif (calcul à vol d'oiseau)</div>`;
+      }
 
-            showResult(`
-                <p style="font-size:0.75rem; text-transform:uppercase; color:#888;">Pour : ${address}</p>
-                <p class="result-price" style="margin:10px 0;">€${total}</p>
-                <div style="margin-top:15px; padding-top:10px; border-top:1px dashed #ebebeb;">${details}</div>
-            `, 'ok');
-        });
-    </script>
+      showResult(`
+        <p style="font-size:0.75rem;text-transform:uppercase;color:#888;">${clientGeo.city || address} – ${distanceKm} km, ${durationSimple} min (simple) / ${durationAR} min (A/R)</p>
+        <p class="result-price" style="margin:10px 0;">€${grandTotal}</p>
+        <div style="margin-top:20px;padding-top:15px;border-top:1px dashed #ebebeb;">${detailsHtml}</div>
+        <div class="result-meta">Zone : ${pricing.zone}</div>
+        ${approxNote}
+      `, "ok");
+
+    } catch (err) {
+      showResult(`<p style="color:#c0392b;">⚠ ${err.message || "Erreur réseau"}</p>`, "err");
+    } finally {
+      btn.textContent = "Calculer mes frais"; btn.disabled = false;
+    }
+  });
+</script>
+
 </body>
 </html>
