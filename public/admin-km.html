@@ -28,10 +28,7 @@
       min-height: 100vh;
     }
 
-    .admin-container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+    .admin-container { max-width: 1100px; margin: 0 auto; }
 
     .header {
       display: flex;
@@ -44,21 +41,12 @@
       gap: 1rem;
     }
 
-    .header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      color: var(--primary);
-    }
-
+    .header h1 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--primary); }
     .header h1 span { color: var(--orange); }
 
-    .btn-group {
-      display: flex;
-      gap: 0.8rem;
-      flex-wrap: wrap;
-    }
+    .btn-group { display: flex; gap: 0.8rem; flex-wrap: wrap; }
 
-    .btn-save, .btn-export, .btn-import {
+    .btn-save, .btn-export, .btn-import, .btn-copy-text {
       background: var(--orange);
       color: white;
       border: none;
@@ -69,7 +57,7 @@
       cursor: pointer;
       white-space: nowrap;
     }
-    .btn-save:hover, .btn-export:hover, .btn-import:hover { background: #e55c00; }
+    .btn-save:hover, .btn-export:hover, .btn-import:hover, .btn-copy-text:hover { background: #e55c00; }
 
     .card {
       background: var(--card);
@@ -88,15 +76,9 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
 
-    .form-group {
-      margin-bottom: 1rem;
-    }
+    .form-group { margin-bottom: 1rem; }
     label {
       display: block;
       font-size: 0.85rem;
@@ -105,8 +87,7 @@
       margin-bottom: 0.3rem;
     }
 
-    input[type="number"],
-    input[type="text"] {
+    input[type="number"], input[type="text"], textarea {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--border);
@@ -115,15 +96,13 @@
       font-size: 0.95rem;
       background: #fafafa;
     }
-    input:focus {
+    input:focus, textarea:focus {
       outline: none;
       border-color: var(--orange);
       box-shadow: 0 0 0 3px var(--orange-light);
     }
 
-    .input-wrapper {
-      position: relative;
-    }
+    .input-wrapper { position: relative; }
     .input-suffix {
       position: absolute;
       right: 12px;
@@ -133,62 +112,34 @@
       font-size: 0.9rem;
     }
 
-    .postal-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    .postal-table th,
-    .postal-table td {
-      padding: 10px;
-      border: 1px solid var(--border);
-      text-align: left;
-    }
-    .postal-table th {
-      background: #f8f9fa;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    .postal-table input {
-      width: 100%;
-      border: 1px solid #ddd;
-      padding: 6px;
-      border-radius: 4px;
-    }
+    .postal-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .postal-table th, .postal-table td { padding: 10px; border: 1px solid var(--border); text-align: left; }
+    .postal-table th { background: #f8f9fa; font-weight: 600; font-size: 0.9rem; }
+    .postal-table input { width: 100%; border: 1px solid #ddd; padding: 6px; border-radius: 4px; }
     .delete-row-btn {
-      background: #c0392b;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 4px;
-      cursor: pointer;
+      background: #c0392b; color: white; border: none;
+      padding: 6px 10px; border-radius: 4px; cursor: pointer;
     }
 
     .config-output {
-      background: #1a1a1a;
-      color: #e0e0e0;
-      padding: 15px;
-      border-radius: 8px;
-      font-family: monospace;
-      white-space: pre-wrap;
-      max-height: 300px;
-      overflow-y: auto;
-      margin-top: 1rem;
+      background: #1a1a1a; color: #e0e0e0; padding: 15px;
+      border-radius: 8px; font-family: monospace; white-space: pre-wrap;
+      max-height: 300px; overflow-y: auto; margin-top: 1rem;
+    }
+
+    .plain-text-output {
+      background: #f8f9fa; padding: 15px; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; white-space: pre-wrap;
+      min-height: 150px; margin-top: 1rem; border: 1px solid var(--border);
+      line-height: 1.6;
     }
 
     .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #10b981;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 500;
+      position: fixed; bottom: 20px; right: 20px;
+      background: #10b981; color: white; padding: 12px 24px;
+      border-radius: 8px; font-weight: 500;
       box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s;
+      transform: translateY(100px); opacity: 0; transition: all 0.3s;
     }
     .toast.show { transform: translateY(0); opacity: 1; }
   </style>
@@ -261,22 +212,28 @@
     <button id="addRowBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">+ Ajouter</button>
   </div>
 
-  <!-- Générateur de config pour le site -->
+  <!-- Bloc de configuration JS pour le site -->
   <div class="card">
-    <div class="card-title">📋 Code à copier dans votre site</div>
+    <div class="card-title">📋 Code <code>getConfig()</code> à copier dans votre site</div>
     <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
-      1. Modifiez les tarifs ci-dessus et cliquez sur <strong>Enregistrer</strong>.<br>
-      2. Copiez le bloc ci-dessous.<br>
-      3. Dans votre page <code>index.html</code>, remplacez toute la fonction <code>getConfig()</code> par ce bloc.
+      Copiez ce bloc et remplacez la fonction <code>getConfig()</code> dans votre page <code>index.html</code>.
     </p>
     <div class="config-output" id="configOutput"></div>
-    <button id="copyConfigBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">📋 Copier dans le presse-papier</button>
+    <button id="copyConfigBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">📋 Copier le code</button>
+  </div>
+
+  <!-- Texte brut pour Google Sites -->
+  <div class="card">
+    <div class="card-title">📝 Texte brut pour Google Sites</div>
+    <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
+      Ce texte peut être copié/collé directement dans l’éditeur de votre page. Il reflète les tarifs actuels.
+    </p>
+    <textarea id="plainTextOutput" class="plain-text-output" readonly></textarea>
+    <button id="copyPlainTextBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">📋 Copier le texte brut</button>
   </div>
 </div>
 
-<!-- Input file caché pour l'import -->
 <input type="file" id="importFileInput" accept=".json" style="display: none;" />
-
 <div class="toast" id="toast">✅ Paramètres enregistrés</div>
 
 <script>
@@ -297,7 +254,6 @@
 
   let currentConfig = JSON.parse(JSON.stringify(defaultConfig));
 
-  // Initialisation
   function loadConfig() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -306,6 +262,7 @@
     populateFields();
     renderPostalTable();
     generateConfigCode();
+    generatePlainTextSummary();
   }
 
   function populateFields() {
@@ -353,7 +310,6 @@
     currentConfig.priceExtraPers = parseFloat(document.getElementById('priceExtraPers').value) || 0;
     currentConfig.priceAnts = parseFloat(document.getElementById('priceAnts').value) || 0;
 
-    // Lire le tableau des codes postaux
     const rows = document.querySelectorAll('#postalTableBody tr');
     const postalPrices = {};
     rows.forEach(row => {
@@ -370,6 +326,7 @@
     readFieldsToConfig();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
     generateConfigCode();
+    generatePlainTextSummary();
     showToast();
   }
 
@@ -397,7 +354,7 @@
   }
 
   function generateConfigCode() {
-    const cfg = JSON.parse(JSON.stringify(currentConfig)); // copie propre
+    const cfg = JSON.parse(JSON.stringify(currentConfig));
     const code = `
 // ⚠️ Ne pas modifier ce bloc manuellement. Copiez-le depuis l'admin.
 function getConfig() {
@@ -405,6 +362,34 @@ function getConfig() {
 }
     `.trim();
     document.getElementById('configOutput').textContent = code;
+  }
+
+  // --- Génération du texte brut pour Google Sites ---
+  function generatePlainTextSummary() {
+    const cfg = currentConfig;
+    // Calcul de l'exemple Paris 11e (22 km, 45 min simple → 90 min A/R)
+    const dist = 22;
+    const timeSimple = 45;
+    const timeAR = timeSimple * 2;
+    const base = cfg.priceExtended;
+    const excessKm = Math.max(0, dist - cfg.extendedMaxKm);
+    const excessMin = Math.max(0, timeAR - cfg.extendedMaxMin);
+    const kmCost = excessKm * cfg.extendedExtraKmPrice;
+    const minCost = excessMin * cfg.extendedExtraMinPrice;
+    const totalExample = Math.round(base + cfg.parisSupplement + kmCost + minCost);
+
+    let text = `📍 Zone Locale (${cfg.localMaxKm} km / ${cfg.localMaxMin} min A/R) : ${cfg.priceLocal} € (+${cfg.localExtraKmPrice} €/km, +${cfg.localExtraMinPrice} €/min)\n`;
+    text += `🚗 Zone Métropolitaine (${cfg.metroMaxKm} km / ${cfg.metroMaxMin} min A/R) : ${cfg.priceMetro} € (+${cfg.metroExtraKmPrice} €/km, +${cfg.metroExtraMinPrice} €/min)\n`;
+    text += `🌍 Zone Étendue (${cfg.extendedMaxKm} km / ${cfg.extendedMaxMin} min A/R) : ${cfg.priceExtended} € (+${cfg.extendedExtraKmPrice} €/km, +${cfg.extendedExtraMinPrice} €/min)\n`;
+    text += `🗼 Supplément Paris intra-muros : +${cfg.parisSupplement} €\n\n`;
+    text += `👥 Suppléments :\n`;
+    text += `  👶 Bébé 0-3 mois : +${cfg.priceBaby} €\n`;
+    text += `  👤 Personne supplémentaire : +${cfg.priceExtraPers} €\n`;
+    text += `  📸 Photos ANTS : +${cfg.priceAnts} €\n\n`;
+    text += `💡 Exemple Paris 11e (22 km, 45 min simple / 90 min A/R) : ${totalExample} €\n`;
+    text += `   Détail : ${base} € (base) + ${cfg.parisSupplement} € (Paris) + ${excessKm} km × ${cfg.extendedExtraKmPrice} € = ${kmCost} € + ${excessMin} min × ${cfg.extendedExtraMinPrice} € = ${minCost} € → Total ${totalExample} €`;
+
+    document.getElementById('plainTextOutput').value = text;
   }
 
   // --- Export JSON ---
@@ -429,18 +414,12 @@ function getConfig() {
   document.getElementById('importFileInput').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
         const imported = JSON.parse(event.target.result);
-        // Validation basique : doit contenir au moins priceStudio
-        if (imported.priceStudio === undefined) {
-          throw new Error('Fichier JSON invalide (champ priceStudio manquant)');
-        }
-        // Fusionner en gardant les valeurs par défaut pour les champs manquants
+        if (imported.priceStudio === undefined) throw new Error('Fichier JSON invalide');
         currentConfig = { ...defaultConfig, ...imported };
-        // S'assurer que postalPrices est bien un objet
         if (typeof currentConfig.postalPrices !== 'object' || currentConfig.postalPrices === null) {
           currentConfig.postalPrices = {};
         }
@@ -448,13 +427,13 @@ function getConfig() {
         renderPostalTable();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
         generateConfigCode();
-        showToast('📥 Configuration importée avec succès');
+        generatePlainTextSummary();
+        showToast('📥 Configuration importée');
       } catch (err) {
-        alert('Erreur lors de l\'import : ' + err.message);
+        alert('Erreur import : ' + err.message);
       }
     };
     reader.readAsText(file);
-    // Réinitialiser le champ pour permettre de réimporter le même fichier
     e.target.value = '';
   });
 
@@ -466,6 +445,11 @@ function getConfig() {
     navigator.clipboard.writeText(text).then(() => showToast('📋 Code copié !'));
   });
 
+  document.getElementById('copyPlainTextBtn').addEventListener('click', () => {
+    const text = document.getElementById('plainTextOutput').value;
+    navigator.clipboard.writeText(text).then(() => showToast('📋 Texte brut copié !'));
+  });
+
   function showToast(msg = '✅ Paramètres enregistrés') {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
@@ -473,7 +457,6 @@ function getConfig() {
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  // Chargement initial
   loadConfig();
 </script>
 
