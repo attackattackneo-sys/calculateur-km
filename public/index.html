@@ -29,23 +29,18 @@
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
-      /* Subtle linen texture */
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23faf8f5'/%3E%3Ccircle cx='1' cy='1' r='0.5' fill='%23e8e4de' opacity='.4'/%3E%3C/svg%3E");
     }
 
     .card {
       background: var(--card);
       border-radius: 24px;
-      box-shadow:
-        0 1px 2px rgba(0,0,0,0.04),
-        0 8px 32px rgba(0,0,0,0.07),
-        0 0 0 1px rgba(0,0,0,0.03);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.07);
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
       overflow: hidden;
     }
 
-    /* ── Header ── */
     .card-header {
       padding: 2rem 2rem 1.5rem;
       border-bottom: 1px solid var(--border);
@@ -59,225 +54,56 @@
       background: linear-gradient(90deg, var(--orange), #ff9a44);
     }
     .logo-line {
-      font-size: 0.7rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--orange);
-      font-weight: 600;
-      margin-bottom: 0.6rem;
+      font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--orange); font-weight: 600; margin-bottom: 0.6rem;
     }
-    h1 {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.65rem;
-      font-weight: 700;
-      color: var(--primary);
-      line-height: 1.2;
-    }
+    h1 { font-family: 'Playfair Display', serif; font-size: 1.65rem; color: var(--primary); }
     h1 span { color: var(--orange); }
 
-    /* ── Body ── */
     .card-body { padding: 1.75rem 2rem; }
 
     .field { margin-bottom: 1.25rem; }
     .field label {
-      display: block;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.5rem;
+      display: block; font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem;
     }
-    .field label .tip {
-      font-weight: 400;
-      text-transform: none;
-      letter-spacing: 0;
-      color: #bbb;
-      font-size: 0.7rem;
-      margin-left: 0.3rem;
+    .field label .tip { font-weight: 400; text-transform: none; color: #bbb; font-size: 0.7rem; margin-left: 0.3rem; }
+    
+    input[type="text"] {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-family: inherit; font-size: 0.95rem;
     }
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      color: var(--primary);
-      background: #fdfdfd;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      -moz-appearance: textfield;
-    }
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    input:focus {
-      outline: none;
-      border-color: var(--orange);
-      box-shadow: 0 0 0 3px var(--orange-glow);
-      background: #fff;
-    }
+    input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-glow); }
 
-    .row { display: flex; gap: 12px; }
-    .row .field { flex: 1; }
+    .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
 
     .number-ctrl {
-      display: flex;
-      align-items: center;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      background: #fdfdfd;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .number-ctrl:focus-within {
-      border-color: var(--orange);
-      box-shadow: 0 0 0 3px var(--orange-glow);
+      display: flex; align-items: center; border: 1.5px solid var(--border);
+      border-radius: 10px; overflow: hidden; background: #fdfdfd;
     }
     .number-ctrl button {
-      width: 38px;
-      height: 42px;
-      border: none;
-      background: none;
-      font-size: 1.2rem;
-      color: var(--orange);
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s;
-      flex-shrink: 0;
+      width: 38px; height: 42px; border: none; background: none;
+      color: var(--orange); cursor: pointer; font-size: 1.2rem;
     }
-    .number-ctrl button:hover { background: var(--orange-light); }
     .number-ctrl input {
-      flex: 1;
-      border: none;
-      border-radius: 0;
-      box-shadow: none;
-      text-align: center;
-      font-weight: 600;
-      padding: 0;
-      min-width: 0;
-      background: transparent;
+      flex: 1; border: none; text-align: center; font-weight: 600; width: 30px;
     }
-    .number-ctrl input:focus { box-shadow: none; border-color: transparent; background: transparent; }
 
-    /* ── CTA ── */
     .btn-calc {
-      width: 100%;
-      padding: 14px;
-      background: var(--orange);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      cursor: pointer;
-      margin-top: 0.5rem;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      width: 100%; padding: 14px; background: var(--orange); color: #fff;
+      border: none; border-radius: 12px; font-weight: 600; cursor: pointer;
       box-shadow: 0 4px 14px var(--orange-glow);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .btn-calc:hover:not(:disabled) {
-      background: #e55c00;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px var(--orange-glow);
-    }
-    .btn-calc:active { transform: translateY(0); }
-    .btn-calc:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-calc:hover { background: #e55c00; transform: translateY(-1px); }
 
-    /* ── Result ── */
     #result { overflow: hidden; max-height: 0; transition: max-height 0.4s ease; }
-    #result.visible { max-height: 320px; }
-
-    .result-inner {
-      border-top: 1px solid var(--border);
-      padding: 1.5rem 2rem 1.75rem;
-    }
+    #result.visible { max-height: 400px; }
+    .result-inner { border-top: 1px solid var(--border); padding: 1.5rem 2rem; }
     .result-inner.ok { background: var(--orange-light); }
-    .result-inner.err {
-      background: #fff5f5;
-      border-top-color: #f5c6c6;
-    }
-
-    .result-city {
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 600;
-      margin-bottom: 0.4rem;
-    }
-    .result-price {
-      font-family: 'Playfair Display', serif;
-      font-size: 3rem;
-      font-weight: 700;
-      color: var(--orange);
-      line-height: 1;
-      margin-bottom: 0.75rem;
-    }
-    .result-price sup { font-size: 1.4rem; vertical-align: super; }
-    .result-meta {
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-    .result-meta strong { color: var(--primary); }
-    .result-badge {
-      display: inline-block;
-      background: var(--orange);
-      color: #fff;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 20px;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
-    .result-err-msg {
-      color: #c0392b;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-    .result-err-msg::before {
-      content: '⚠';
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    /* ── Loader ── */
-    .spinner {
-      width: 18px; height: 18px;
-      border: 2.5px solid rgba(255,255,255,0.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: none;
-    }
-    .btn-calc.loading .spinner { display: block; }
-    .btn-calc.loading .btn-label { opacity: 0.7; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Footer note ── */
-    .card-note {
-      padding: 1rem 2rem;
-      border-top: 1px solid var(--border);
-      font-size: 0.72rem;
-      color: #bbb;
-      text-align: center;
-      line-height: 1.5;
-    }
-
-    @media (max-width: 480px) {
-      .card-header, .card-body { padding-left: 1.25rem; padding-right: 1.25rem; }
-      .result-inner { padding-left: 1.25rem; padding-right: 1.25rem; }
-      .card-note { padding-left: 1.25rem; padding-right: 1.25rem; }
-    }
+    .result-price { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: var(--orange); }
+    .result-meta { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-top: 8px; }
+    
+    .card-note { padding: 1rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: #bbb; text-align: center; }
   </style>
 </head>
 <body>
@@ -285,224 +111,158 @@
 <div class="card">
   <div class="card-header">
     <p class="logo-line">GregPhotographe &mdash; Studio</p>
-    <h1>Estimation des <span>frais de trajet</span></h1>
+    <h1>Estimation des <span>frais</span></h1>
   </div>
 
   <div class="card-body">
     <div class="field">
       <label for="address">Lieu de la prestation</label>
-      <input id="address" type="text" placeholder="Ville ou code postal (ex: Melun 77000)…" autocomplete="off" />
+      <input id="address" type="text" placeholder="Ville ou code postal…" />
     </div>
 
-    <div class="row">
+    <div class="row-grid">
       <div class="field">
-        <label>Bébés (0-3 mois) <span class="tip">+15 € / bébé</span></label>
+        <label>Bébés (0-3m) <span class="tip">+15€</span></label>
         <div class="number-ctrl">
-          <button type="button" data-target="babies" data-op="minus" aria-label="Moins">−</button>
-          <input id="babies" type="number" min="0" value="0" readonly />
-          <button type="button" data-target="babies" data-op="plus" aria-label="Plus">+</button>
+          <button type="button" data-target="babies" data-op="minus">−</button>
+          <input id="babies" type="number" value="0" readonly />
+          <button type="button" data-target="babies" data-op="plus">+</button>
         </div>
       </div>
       <div class="field">
-        <label>Photos ANTS <span class="tip">+5 € / pers.</span></label>
+        <label>Pers. sup. <span class="tip">+15€</span></label>
         <div class="number-ctrl">
-          <button type="button" data-target="ants" data-op="minus" aria-label="Moins">−</button>
-          <input id="ants" type="number" min="0" value="0" readonly />
-          <button type="button" data-target="ants" data-op="plus" aria-label="Plus">+</button>
+          <button type="button" data-target="persons" data-op="minus">−</button>
+          <input id="persons" type="number" value="0" readonly />
+          <button type="button" data-target="persons" data-op="plus">+</button>
         </div>
       </div>
     </div>
 
-    <button id="btn" class="btn-calc" type="button">
-      <div class="spinner"></div>
-      <span class="btn-label">Calculer mes frais</span>
-    </button>
+    <div class="field">
+      <label>Photos ANTS <span class="tip">+5€ / pers.</span></label>
+      <div class="number-ctrl">
+        <button type="button" data-target="ants" data-op="minus">−</button>
+        <input id="ants" type="number" value="0" readonly />
+        <button type="button" data-target="ants" data-op="plus">+</button>
+      </div>
+    </div>
+
+    <button id="btn" class="btn-calc">Calculer mes frais</button>
   </div>
 
-  <div id="result" aria-live="polite"></div>
-
-  <p class="card-note">Itinéraire calculé depuis le studio · 16 bd Carnot, Neuilly-sur-Marne</p>
+  <div id="result"></div>
+  <p class="card-note">Itinéraire calculé depuis le studio à Neuilly-sur-Marne</p>
 </div>
 
 <script>
-/* ── Configuration ── */
 const STUDIO_ADDRESS = "16 boulevard Carnot, 93330 Neuilly-sur-Marne, France";
+const NEARBY_CITIES = new Set(["noisy-le-grand", "chelles", "neuilly-plaisance", "gagny", "le perreux-sur-marne", "gournay-sur-marne"]);
 
-// Villes limitrophes (Zone 1 — tarif 79 €)
-const NEARBY_CITIES = new Set([
-  "noisy-le-grand",
-  "chelles",
-  "neuilly-plaisance",
-  "gagny",
-  "le perreux-sur-marne",
-  "gournay-sur-marne"
-]);
-
-/* ── Calcul du prix ── */
 function round1(n) { return Math.round(n * 10) / 10; }
 
-function computePrice({ city, department, distanceKm, babies, ants }) {
+function computePrice({ city, department, distanceKm, babies, ants, persons }) {
   const cityN = (city || "").trim().toLowerCase();
-  let base, explanation;
+  let base = 0; let kmExtra = 0; let zoneLabel = ""; let details = [];
 
   if (cityN.includes("neuilly-sur-marne")) {
-    base = 59; explanation = "Zone 1 — Neuilly-sur-Marne.";
+    base = 59; zoneLabel = "Forfait Zone 1 (Neuilly-sur-Marne)";
   } else if (NEARBY_CITIES.has(cityN)) {
-    base = 79; explanation = "Zone 1 — Ville limitrophe.";
+    base = 79; zoneLabel = "Forfait Zone 1 (Ville limitrophe)";
   } else if (department === "75") {
-    base = 150; explanation = "Zone 4 — Paris (75) intra-muros.";
+    base = 150; zoneLabel = "Forfait Zone 4 (Paris Intra-muros)";
   } else if (["93", "94", "77"].includes(department)) {
-    if (distanceKm <= 7) {
-      base = 95; explanation = "Zone 2 — Dpt 93/94/77 (≤ 7 km).";
-    } else {
-      base = 125; explanation = "Zone 3 — Déplacement étendu (> 7 km).";
-      if (distanceKm > 12) {
-        const extraKm = distanceKm - 12;
-        base += extraKm * 3.8;
-        explanation += ` (+ ${round1(extraKm)} km à 3,80 €/km).`;
-      }
-    }
-    base = Math.round(base);
-  } else {
-    return { price: null, explanation: "Hors zone — merci de me contacter directement." };
+    if (distanceKm <= 7) { base = 95; zoneLabel = "Zone 2 (≤ 7km)"; } 
+    else { base = 125; zoneLabel = "Zone 3 (> 7km)"; if (distanceKm > 12) kmExtra = (distanceKm - 12) * 3.8; }
+  } else if (["91", "92", "78"].includes(department)) {
+    if (distanceKm <= 7) { base = 150; zoneLabel = "Zone 4 (≤ 7km)"; } 
+    else { base = 160; zoneLabel = "Zone 4 (> 7km)"; if (distanceKm > 10) kmExtra = (distanceKm - 10) * 4; }
   }
 
-  // Suppléments
-  const babyExtra = (babies || 0) * 15;
-  const antExtra  = (ants  || 0) * 5;
-  const extras = [];
-  if (babyExtra) extras.push(`+${babyExtra} € bébé${babies > 1 ? "s" : ""}`);
-  if (antExtra)  extras.push(`+${antExtra} € ANTS`);
+  if (base === 0) return { total: null, explanation: "Hors zone — sur devis uniquement." };
 
-  const total = base + babyExtra + antExtra;
-  const extrasLabel = extras.length ? extras.join(", ") : null;
+  const babyTotal = babies * 15; const antsTotal = ants * 5; const persTotal = persons * 15;
 
-  return { price: total, basePrice: base, extrasLabel, explanation };
+  details.push({ label: zoneLabel, value: base });
+  if (kmExtra > 0) details.push({ label: `Indemnité kilométrique`, value: Math.round(kmExtra) });
+  if (babyTotal > 0) details.push({ label: `Supplément Bébé (x${babies})`, value: babyTotal });
+  if (persTotal > 0) details.push({ label: `Pers. sup. (x${persons})`, value: persTotal });
+  if (antsTotal > 0) details.push({ label: `Photos ANTS (x${ants})`, value: antsTotal });
+
+  const total = Math.round(base + kmExtra + babyTotal + antsTotal + persTotal);
+  return { total, details };
 }
 
-/* ── Géocodage via Nominatim ── */
 async function geocode(address) {
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("q", address.includes("France") ? address : `${address}, France`);
-  url.searchParams.set("format", "json");
-  url.searchParams.set("addressdetails", "1");
-  url.searchParams.set("limit", "1");
-  url.searchParams.set("countrycodes", "fr");
-
-  const r = await fetch(url.toString(), {
-    headers: { "User-Agent": "GregPhotographe-km-calculator/1.1" }
-  });
+  url.searchParams.set("format", "json"); url.searchParams.set("addressdetails", "1");
+  url.searchParams.set("limit", "1"); url.searchParams.set("countrycodes", "fr");
+  const r = await fetch(url.toString(), { headers: { "User-Agent": "GregPhotographe-km-calculator/1.0" } });
   const data = await r.json();
   if (!Array.isArray(data) || !data[0]) throw new Error("Adresse introuvable.");
-
-  const item = data[0];
-  const a = item.address || {};
-  
-  // Correction pour les grandes villes comme Melun
-  const city = a.city || a.town || a.municipality || a.village || a.suburb || a.county || item.name || "";
-  
-  // Correction pour récupérer le code postal à tous les coups
-  let postcode = a.postcode || "";
-  if (!postcode && item.display_name) {
-    const match = item.display_name.match(/\b\d{5}\b/);
-    if (match) postcode = match[0];
-  }
-  const department = postcode.slice(0, 2);
-
-  return { lat: Number(item.lat), lon: Number(item.lon), city, department, postcode };
+  const a = data[0].address || {};
+  return { lat: Number(data[0].lat), lon: Number(data[0].lon), city: a.city || a.town || a.village || "", department: (a.postcode || "").slice(0, 2) };
 }
 
-/* ── Calcul de l'itinéraire via OSRM ── */
 async function routeKm(fromLat, fromLon, toLat, toLon) {
   const url = `https://router.project-osrm.org/route/v1/driving/${fromLon},${fromLat};${toLon},${toLat}?overview=false`;
-  const r = await fetch(url);
-  const data = await r.json();
-  if (data.code !== "Ok" || !data.routes?.[0]) throw new Error("Itinéraire routier indisponible.");
-  return data.routes[0].distance / 1000; // mètres → km
+  const r = await fetch(url); const data = await r.json();
+  if (data.code !== "Ok" || !data.routes?.[0]) throw new Error("Itinéraire indisponible.");
+  return data.routes[0].distance / 1000;
 }
 
-/* ── UI ── */
-const btn      = document.getElementById("btn");
-const result  = document.getElementById("result");
-const addrEl  = document.getElementById("address");
-const babiesEl = document.getElementById("babies");
-const antsEl   = document.getElementById("ants");
+const btn = document.getElementById("btn");
+const result = document.getElementById("result");
 
-// Contrôles +/−
 document.querySelectorAll(".number-ctrl button").forEach(b => {
   b.addEventListener("click", () => {
     const input = document.getElementById(b.dataset.target);
-    const val = parseInt(input.value, 10) || 0;
-    input.value = b.dataset.op === "plus" ? val + 1 : Math.max(0, val - 1);
+    let v = parseInt(input.value) || 0;
+    input.value = b.dataset.op === "plus" ? v + 1 : Math.max(0, v - 1);
   });
 });
-
-// Entrée clavier → calcul
-addrEl.addEventListener("keydown", e => { if (e.key === "Enter") btn.click(); });
-
-function setLoading(on) {
-  btn.disabled = on;
-  btn.classList.toggle("loading", on);
-  btn.querySelector(".btn-label").textContent = on ? "Recherche…" : "Calculer mes frais";
-}
 
 function showResult(html, type) {
   result.innerHTML = `<div class="result-inner ${type}">${html}</div>`;
   result.className = "visible";
 }
 
-function showError(msg) {
-  showResult(`<div class="result-err-msg">${msg}</div>`, "err");
-}
-
 btn.addEventListener("click", async () => {
-  const address = addrEl.value.trim();
-  if (!address) { showError("Merci de saisir une adresse ou une ville."); return; }
-
-  const babies = parseInt(babiesEl.value, 10) || 0;
-  const ants   = parseInt(antsEl.value,   10) || 0;
-
-  setLoading(true);
-  result.className = ""; // masquer pendant la recherche
-  result.innerHTML = "";
-
+  const addr = document.getElementById("address").value.trim();
+  if(!addr) return showResult(`<p style="color:#c0392b; font-size:0.9rem">⚠ Merci de saisir une adresse.</p>`, "err");
+  
+  btn.textContent = "Recherche en cours..."; btn.disabled = true;
+  
   try {
-    const [studio, client] = await Promise.all([
-      geocode(STUDIO_ADDRESS),
-      geocode(address)
-    ]);
+    const [studio, client] = await Promise.all([geocode(STUDIO_ADDRESS), geocode(addr)]);
+    const distanceKm = round1(await routeKm(studio.lat, studio.lon, client.lat, client.lon));
 
-    const distKmRaw = await routeKm(studio.lat, studio.lon, client.lat, client.lon);
-    const distanceKm = round1(distKmRaw);
+    const pricing = computePrice({ 
+      city: client.city, department: client.department, distanceKm,
+      babies: parseInt(document.getElementById("babies").value) || 0,
+      ants: parseInt(document.getElementById("ants").value) || 0,
+      persons: parseInt(document.getElementById("persons").value) || 0
+    });
 
-    const pricing = computePrice({ city: client.city, department: client.department, distanceKm, babies, ants });
+    if (!pricing.total) return showResult(`<p style="color:#c0392b; font-size:0.9rem">⚠ ${pricing.explanation}</p>`, "err");
 
-    if (!pricing.price) {
-      showResult(`
-        <p class="result-city">${client.city || address}</p>
-        <p class="result-meta" style="margin-top:.5rem">${pricing.explanation}</p>
-        <p class="result-meta" style="margin-top:.25rem">Distance : ${distanceKm} km</p>
-      `, "ok");
-      return;
-    }
-
-    const extrasHtml = pricing.extrasLabel
-      ? `<br><span class="result-badge">+</span>${pricing.extrasLabel} inclus`
-      : "";
+    let detailsHtml = pricing.details.map(d => `
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem;">
+        <span style="color: #666;">${d.label}</span><span style="font-weight: 600;">${d.value} €</span>
+      </div>`).join('');
 
     showResult(`
-      <p class="result-city">${client.city || address}</p>
-      <p class="result-price"><sup>€</sup>${pricing.price}</p>
-      <div class="result-meta">
-        <strong>${distanceKm} km</strong> depuis le studio${extrasHtml}
-        <br><span style="margin-top:.3rem;display:block">${pricing.explanation}</span>
-      </div>
+      <p class="result-city" style="font-size:0.75rem; text-transform:uppercase; color:#888; font-weight:600;">Détail pour ${client.city || addr}</p>
+      <p class="result-price" style="font-family:'Playfair Display', serif; font-size:3rem; font-weight:700; color:#ff6600; margin:10px 0;"><sup>€</sup>${pricing.total}</p>
+      <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ebebeb;">${detailsHtml}</div>
+      <div class="result-meta" style="margin-top: 15px; font-size:0.8rem; color:#888; font-style:italic;">Distance calculée : ${distanceKm} km depuis le studio.</div>
     `, "ok");
 
   } catch (err) {
-    showError(err.message || "Adresse introuvable ou service indisponible. Réessaie dans un instant.");
+    showResult(`<p style="color:#c0392b; font-size:0.9rem">⚠ ${err.message || "Erreur de calcul."}</p>`, "err");
   } finally {
-    setLoading(false);
+    btn.textContent = "Calculer mes frais"; btn.disabled = false;
   }
 });
 </script>
