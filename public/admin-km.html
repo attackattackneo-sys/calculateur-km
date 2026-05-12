@@ -40,6 +40,8 @@
       margin-bottom: 2rem;
       padding-bottom: 1rem;
       border-bottom: 2px solid var(--border);
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .header h1 {
@@ -50,7 +52,13 @@
 
     .header h1 span { color: var(--orange); }
 
-    .btn-save {
+    .btn-group {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-save, .btn-export, .btn-import {
       background: var(--orange);
       color: white;
       border: none;
@@ -59,8 +67,9 @@
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
+      white-space: nowrap;
     }
-    .btn-save:hover { background: #e55c00; }
+    .btn-save:hover, .btn-export:hover, .btn-import:hover { background: #e55c00; }
 
     .card {
       background: var(--card);
@@ -189,7 +198,11 @@
 <div class="admin-container">
   <div class="header">
     <h1>Administration <span>Tarifs</span></h1>
-    <button class="btn-save" id="saveAllBtn">💾 Enregistrer</button>
+    <div class="btn-group">
+      <button class="btn-import" id="importBtn">📥 Importer JSON</button>
+      <button class="btn-export" id="exportBtn">📤 Exporter JSON</button>
+      <button class="btn-save" id="saveAllBtn">💾 Enregistrer</button>
+    </div>
   </div>
 
   <!-- Grille zonale -->
@@ -202,8 +215,8 @@
       </div>
       <div>
         <h4>📍 Zone Locale</h4>
-        <label>Distance max (km)</label><input type="number" id="localMaxKm" value="8" step="0.1" />
-        <label>Temps max (min A/R)</label><input type="number" id="localMaxMin" value="15" />
+        <label>Distance max (km)</label><input type="number" id="localMaxKm" value="6" step="0.1" />
+        <label>Temps max (min A/R)</label><input type="number" id="localMaxMin" value="20" />
         <label>Forfait (€)</label><input type="number" id="priceLocal" value="79" />
         <label>€/km sup.</label><input type="number" id="localExtraKmPrice" value="2.5" step="0.1" />
         <label>€/min sup.</label><input type="number" id="localExtraMinPrice" value="1.5" step="0.1" />
@@ -211,7 +224,7 @@
       <div>
         <h4>🚗 Zone Métropolitaine</h4>
         <label>Distance max (km)</label><input type="number" id="metroMaxKm" value="10" step="0.1" />
-        <label>Temps max (min A/R)</label><input type="number" id="metroMaxMin" value="25" />
+        <label>Temps max (min A/R)</label><input type="number" id="metroMaxMin" value="35" />
         <label>Forfait (€)</label><input type="number" id="priceMetro" value="129" />
         <label>€/km sup.</label><input type="number" id="metroExtraKmPrice" value="2.5" step="0.1" />
         <label>€/min sup.</label><input type="number" id="metroExtraMinPrice" value="1.5" step="0.1" />
@@ -222,8 +235,8 @@
         <label>Temps max (min A/R)</label><input type="number" id="extendedMaxMin" value="45" />
         <label>Forfait (€)</label><input type="number" id="priceExtended" value="179" />
         <label>Supplément Paris (€)</label><input type="number" id="parisSupplement" value="35" />
-        <label>€/km sup.</label><input type="number" id="extendedExtraKmPrice" value="1.5" step="0.1" />
-        <label>€/min sup.</label><input type="number" id="extendedExtraMinPrice" value="1.5" step="0.1" />
+        <label>€/km sup.</label><input type="number" id="extendedExtraKmPrice" value="1" step="0.1" />
+        <label>€/min sup.</label><input type="number" id="extendedExtraMinPrice" value="1" step="0.1" />
       </div>
     </div>
     <h4 style="margin-top:1rem;">👥 Suppléments</h4>
@@ -254,12 +267,15 @@
     <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
       1. Modifiez les tarifs ci-dessus et cliquez sur <strong>Enregistrer</strong>.<br>
       2. Copiez le bloc ci-dessous.<br>
-      3. Dans votre page <code>index.html</code> (intégration Google Sites), remplacez toute la fonction <code>getConfig()</code> par ce bloc.
+      3. Dans votre page <code>index.html</code>, remplacez toute la fonction <code>getConfig()</code> par ce bloc.
     </p>
     <div class="config-output" id="configOutput"></div>
     <button id="copyConfigBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">📋 Copier dans le presse-papier</button>
   </div>
 </div>
+
+<!-- Input file caché pour l'import -->
+<input type="file" id="importFileInput" accept=".json" style="display: none;" />
 
 <div class="toast" id="toast">✅ Paramètres enregistrés</div>
 
@@ -268,24 +284,31 @@
 
   const defaultConfig = {
     priceStudio: 59,
-    localMaxKm: 8, localMaxMin: 15, priceLocal: 79,
+    localMaxKm: 6, localMaxMin: 20, priceLocal: 79,
     localExtraKmPrice: 2.5, localExtraMinPrice: 1.5,
-    metroMaxKm: 10, metroMaxMin: 25, priceMetro: 129,
+    metroMaxKm: 10, metroMaxMin: 35, priceMetro: 129,
     metroExtraKmPrice: 2.5, metroExtraMinPrice: 1.5,
     extendedMaxKm: 12, extendedMaxMin: 45, priceExtended: 179,
     parisSupplement: 35,
-    extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1.5,
+    extendedExtraKmPrice: 1, extendedExtraMinPrice: 1,
     priceBaby: 15, priceExtraPers: 15, priceAnts: 5,
-    postalPrices: {}
+    postalPrices: {"77500": 95}
   };
 
   let currentConfig = JSON.parse(JSON.stringify(defaultConfig));
 
+  // Initialisation
   function loadConfig() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try { currentConfig = JSON.parse(saved); } catch (e) {}
     }
+    populateFields();
+    renderPostalTable();
+    generateConfigCode();
+  }
+
+  function populateFields() {
     document.getElementById('priceStudio').value = currentConfig.priceStudio;
     document.getElementById('localMaxKm').value = currentConfig.localMaxKm;
     document.getElementById('localMaxMin').value = currentConfig.localMaxMin;
@@ -306,11 +329,9 @@
     document.getElementById('priceBaby').value = currentConfig.priceBaby;
     document.getElementById('priceExtraPers').value = currentConfig.priceExtraPers;
     document.getElementById('priceAnts').value = currentConfig.priceAnts;
-    renderPostalTable();
-    generateConfigCode();
   }
 
-  function saveConfig() {
+  function readFieldsToConfig() {
     currentConfig.priceStudio = parseFloat(document.getElementById('priceStudio').value) || 0;
     currentConfig.localMaxKm = parseFloat(document.getElementById('localMaxKm').value) || 0;
     currentConfig.localMaxMin = parseFloat(document.getElementById('localMaxMin').value) || 0;
@@ -332,6 +353,7 @@
     currentConfig.priceExtraPers = parseFloat(document.getElementById('priceExtraPers').value) || 0;
     currentConfig.priceAnts = parseFloat(document.getElementById('priceAnts').value) || 0;
 
+    // Lire le tableau des codes postaux
     const rows = document.querySelectorAll('#postalTableBody tr');
     const postalPrices = {};
     rows.forEach(row => {
@@ -342,7 +364,10 @@
       if (code && !isNaN(price)) postalPrices[code] = price;
     });
     currentConfig.postalPrices = postalPrices;
+  }
 
+  function saveConfig() {
+    readFieldsToConfig();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
     generateConfigCode();
     showToast();
@@ -372,7 +397,7 @@
   }
 
   function generateConfigCode() {
-    const cfg = currentConfig;
+    const cfg = JSON.parse(JSON.stringify(currentConfig)); // copie propre
     const code = `
 // ⚠️ Ne pas modifier ce bloc manuellement. Copiez-le depuis l'admin.
 function getConfig() {
@@ -382,8 +407,60 @@ function getConfig() {
     document.getElementById('configOutput').textContent = code;
   }
 
+  // --- Export JSON ---
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    readFieldsToConfig();
+    const json = JSON.stringify(currentConfig, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gregPricingConfig.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('📤 Configuration exportée');
+  });
+
+  // --- Import JSON ---
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFileInput').click();
+  });
+
+  document.getElementById('importFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const imported = JSON.parse(event.target.result);
+        // Validation basique : doit contenir au moins priceStudio
+        if (imported.priceStudio === undefined) {
+          throw new Error('Fichier JSON invalide (champ priceStudio manquant)');
+        }
+        // Fusionner en gardant les valeurs par défaut pour les champs manquants
+        currentConfig = { ...defaultConfig, ...imported };
+        // S'assurer que postalPrices est bien un objet
+        if (typeof currentConfig.postalPrices !== 'object' || currentConfig.postalPrices === null) {
+          currentConfig.postalPrices = {};
+        }
+        populateFields();
+        renderPostalTable();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
+        generateConfigCode();
+        showToast('📥 Configuration importée avec succès');
+      } catch (err) {
+        alert('Erreur lors de l\'import : ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    // Réinitialiser le champ pour permettre de réimporter le même fichier
+    e.target.value = '';
+  });
+
   document.getElementById('addRowBtn').addEventListener('click', () => addRow('', ''));
   document.getElementById('saveAllBtn').addEventListener('click', saveConfig);
+
   document.getElementById('copyConfigBtn').addEventListener('click', () => {
     const text = document.getElementById('configOutput').textContent;
     navigator.clipboard.writeText(text).then(() => showToast('📋 Code copié !'));
@@ -396,6 +473,7 @@ function getConfig() {
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
+  // Chargement initial
   loadConfig();
 </script>
 
