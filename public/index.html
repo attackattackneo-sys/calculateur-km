@@ -156,13 +156,20 @@
 </div>
 
 <script>
-  // Configuration chargée depuis localStorage (mise à jour automatique par l'admin)
+  // Configuration chargée depuis localStorage (mise à jour automatique)
   function getConfig() {
     const saved = localStorage.getItem('gregPricingV2');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+      try { 
+        const cfg = JSON.parse(saved);
+        console.log('✅ Config chargée depuis localStorage', cfg);
+        return cfg;
+      } catch (e) {
+        console.error('Erreur parsing config', e);
+      }
     }
-    // Fallback ultra-basique
+    console.warn('⚠️ Aucune config trouvée, fallback utilisé');
+    // Fallback basique (valeurs usine)
     return {
       priceStudio: 59,
       localMaxKm: 8, localMaxMin: 15, priceLocal: 79,
@@ -184,16 +191,17 @@
     document.getElementById('antsUnitPrice').textContent = cfg.priceAnts;
   }
 
-  // Écoute des changements dans les autres onglets
+  // Réagir aux modifications dans d'autres onglets
   window.addEventListener('storage', (e) => {
     if (e.key === 'gregPricingV2') {
+      console.log('🔄 Changement détecté depuis un autre onglet');
       updateUIPrices();
     }
   });
 
   window.addEventListener('load', updateUIPrices);
 
-  // Extraction du code postal (5 chiffres)
+  // Extraction code postal
   function extractPostcode(text) {
     const match = text.match(/\b(\d{5})\b/);
     return match ? match[1] : null;
@@ -207,26 +215,25 @@
     let price = null;
     let explanation = '';
 
-    // 1. Vérifier dans les tarifs directs par code postal
+    // 1. Tarif direct code postal
     if (postcode && cfg.postalPrices && cfg.postalPrices[postcode] !== undefined) {
       price = cfg.postalPrices[postcode];
       explanation = `Tarif direct pour le code postal ${postcode}`;
       return { price, explanation };
     }
 
-    // 2. Si c'est Neuilly-sur-Marne (même sans code postal)
+    // 2. Neuilly-sur-Marne
     if (input.includes('neuilly-sur-marne') || input === '93330') {
       price = cfg.priceStudio;
       explanation = 'Studio (Neuilly-sur-Marne)';
       return { price, explanation };
     }
 
-    // 3. Si on a quand même un département (via code postal ou approximation)
+    // 3. Détermination du département
     let dept = null;
     if (postcode) {
       dept = postcode.substring(0, 2);
     } else {
-      // Essayer de deviner le département via le nom (très basique)
       const deptMap = {
         'paris': '75', 'seine-saint-denis': '93', 'val-de-marne': '94',
         'essonne': '91', 'hauts-de-seine': '92', 'yvelines': '78',
@@ -240,16 +247,12 @@
       }
     }
 
-    // 4. Application de la grille zonale avec des distances/temps fictifs (on ne les a pas)
-    // On va se baser sur le département pour choisir une zone par défaut, 
-    // puis estimer forfaitairement les dépassements selon la distance approximative
-    // => Trop imprécis, on propose Tarif minimum de la zone la plus probable.
     if (dept) {
       let zone = 'locale';
       if (dept === '75' || dept === '92' || dept === '78' || dept === '91' || dept === '95') {
         zone = 'etendue';
       } else if (dept === '77' || dept === '93' || dept === '94') {
-        zone = 'metro'; // ou local selon proximité
+        zone = 'metro';
       }
 
       if (zone === 'local') {
@@ -269,7 +272,6 @@
       return { price, explanation };
     }
 
-    // Aucune correspondance
     return null;
   }
 
