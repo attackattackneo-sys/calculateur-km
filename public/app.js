@@ -1,4 +1,5 @@
 const STUDIO_ADDRESS = "16 boulevard Carnot, 93330 Neuilly-sur-Marne, France";
+const ORS_API_KEY = "5b3ce3597851110001cf6248";
 
 function getPricingConfig() {
   const saved = localStorage.getItem('gregPricingV2');
@@ -76,49 +77,106 @@ function computePrice(city, department, distanceKm, durationMinSimple) {
 }
 
 async function geocode(address) {
-  const url = new URL("https://nominatim.openstreetmap.org/search");
-  url.searchParams.set("q", address.includes("France") ? address : `${address}, France`);
-  url.searchParams.set("format", "json");
-  url.searchParams.set("addressdetails", "1");
-  url.searchParams.set("limit", "1");
-  url.searchParams.set("countrycodes", "fr");
-  const r = await fetch(url.toString(), {
-    headers: { "User-Agent": "GregPhotographe-km-calculator/1.0" }
-  });
-  const data = await r.json();
-  if (!Array.isArray(data) || !data[0]) throw new Error("Adresse introuvable.");
-  const a = data[0].address || {};
-  return {
-    lat: Number(data[0].lat),
-    lon: Number(data[0].lon),
-    city: a.city || a.town || a.village || "",
-    department: (a.postcode || "").slice(0, 2)
-  };
+  try {
+    const url = new URL("https://nominatim.openstreetmap.org/search");
+    url.searchParams.set("q", address.includes("France") ? address : `${address}, France`);
+    url.searchParams.set("format", "json");
+    url.searchParams.set("addressdetails", "1");
+    url.searchParams.set("limit", "1");
+    url.searchParams.set("countrycodes", "fr");
+    const r = await fetch(url.toString(), {
+      headers: { "User-Agent": "GregPhotographe-km-calculator/1.0" }
+    });
+    if (!r.ok) throw new Error("Erreur réseau Nominatim");
+    const data = await r.json();
+    if (!Array.isArray(data) || !data[0]) throw new Error("Adresse introuvable");
+    const a = data[0].address || {};
+    return {
+      lat: Number(data[0].lat),
+      lon: Number(data[0].lon),
+      city: a.city || a.town || a.village || "",
+      department: (a.postcode || "").slice(0, 2)
+    };
+  } catch (e) {
+    console.warn("Nominatim échoue, fallback code postal", e);
+    const postcodeMatch = address.match(/\b(\d{5})\b/);
+    if (postcodeMatch) {
+      const dept = postcodeMatch[1].slice(0, 2);
+      const deptCenter = {
+        "75": { lat: 48.8566, lon: 2.3522 },
+        "77": { lat: 48.5399, lon: 2.6595 },
+        "78": { lat: 48.8014, lon: 2.1303 },
+        "91": { lat: 48.5839, lon: 2.3081 },
+        "92": { lat: 48.8924, lon: 2.2153 },
+        "93": { lat: 48.9316, lon: 2.3976 },
+        "94": { lat: 48.7846, lon: 2.4238 },
+        "95": { lat: 49.0375, lon: 2.0749 }
+      };
+      if (deptCenter[dept]) {
+        return {
+          lat: deptCenter[dept].lat,
+          lon: deptCenter[dept].lon,
+          city: address,
+          department: dept
+        };
+      }
+    }
+    throw new Error("Impossible de localiser cette adresse. Veuillez réessayer ou saisir un code postal.");
+  }
 }
 
-async function routeOsrm(fromLat, fromLon, toLat, toLon) {
-  const url = `https://router.project-osrm.org/route/v1/driving/${fromLon},${fromLat};${toLon},${toLat}?overview=false&steps=false`;
-  const r = await fetch(url);
-  const j = await r.json();
-  if (j.code !== "Ok" || !j.routes?.[0]) throw new Error("Itinéraire indisponible.");
-  const distanceKm = j.routes[0].distance / 1000;
-  const durationMinSimple = j.routes[0].duration / 60;
+async function routeORS(fromLat, fromLon, toLat, toLon) {
+  const body = { coordinates: [[fromLon, fromLat], [toLon, toLat]], format: "json" };
+  const url = "https://api.openrouteservice.org/v2/directions/driving-car";
+  const r = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Authorization": ORS_API_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error("Service de routage indisponible");
+  const data = await r.json();
+  if (!data.routes || !data.routes[0]) throw new Error("Itinéraire introuvable");
+  const distanceKm = data.routes[0].summary.distance / 1000;
+  const durationMinSimple = data.routes[0].summary.duration / 60;
   return { distanceKm: round1(distanceKm), durationMinSimple: round1(durationMinSimple) };
 }
 
+function computeCrowFliesDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) ** 2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+async function getRouteWrapper(fromLat, fromLon, toLat, toLon) {
+  try {
+    return await routeORS(fromLat, fromLon, toLat, toLon);
+  } catch (e) {
+    console.warn("ORS échoue, fallback à vol d'oiseau", e);
+    const dist = computeCrowFliesDistance(fromLat, fromLon, toLat, toLon);
+    const durationSimple = (dist / 40) * 60;
+    return { distanceKm: round1(dist * 1.3), durationMinSimple: round1(durationSimple * 1.5) };
+  }
+}
+
+// Fonction principale
 async function calculate(address, babies, persons, ants) {
-  const studio = await geocode(STUDIO_ADDRESS);
-  const client = await geocode(address);
-  const route = await routeOsrm(studio.lat, studio.lon, client.lat, client.lon);
-  const pricing = computePrice(client.city, client.department, route.distanceKm, route.durationMinSimple);
+  const studioGeo = await geocode(STUDIO_ADDRESS);
+  const clientGeo = await geocode(address);
+  const route = await getRouteWrapper(studioGeo.lat, studioGeo.lon, clientGeo.lat, clientGeo.lon);
+  const pricing = computePrice(clientGeo.city, clientGeo.department, route.distanceKm, route.durationMinSimple);
   const cfg = getPricingConfig();
   const babyCost = babies * cfg.priceBaby;
   const persCost = persons * cfg.priceExtraPers;
   const antsCost = ants * cfg.priceAnts;
   const grandTotal = pricing.price + babyCost + persCost + antsCost;
-
   return {
-    city: client.city,
+    city: clientGeo.city,
     distanceKm: route.distanceKm,
     durationSimple: route.durationMinSimple,
     durationAR: route.durationMinSimple * 2,
@@ -129,7 +187,7 @@ async function calculate(address, babies, persons, ants) {
   };
 }
 
-// Exemple d'intégration DOM
+// Intégration UI (exemple)
 const btn = document.getElementById("btn");
 const out = document.getElementById("out");
 const addressEl = document.getElementById("address");
@@ -162,7 +220,6 @@ if (btn) {
   btn.addEventListener("click", async () => {
     const address = addressEl.value.trim();
     if (!address) return setError("Merci de saisir une adresse ou une ville.");
-
     try {
       setLoading();
       const babies = parseInt(document.getElementById("babies")?.value) || 0;
