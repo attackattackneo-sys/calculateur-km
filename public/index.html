@@ -165,12 +165,18 @@ function computePrice({ city, department, distanceKm, babies, ants, persons }) {
   const cityN = (city || "").trim().toLowerCase();
   let base = 0; let kmExtra = 0; let zoneLabel = ""; let details = [];
 
-  if (cityN.includes("neuilly-sur-marne")) {
+if (cityN.includes("neuilly-sur-marne")) {
     base = 59; zoneLabel = "Forfait Zone 1 (Neuilly-sur-Marne)";
   } else if (NEARBY_CITIES.has(cityN)) {
     base = 79; zoneLabel = "Forfait Zone 1 (Ville limitrophe)";
   } else if (department === "75") {
-    base = 150; zoneLabel = "Forfait Zone 4 (Paris Intra-muros)";
+    // Paris (75)
+    base = 150; 
+    zoneLabel = "Forfait Paris Intra-muros";
+    // Selon ton tableau : 150€ inclus jusqu'à 12km, puis 5€/km sup.
+    if (distanceKm > 12) {
+      kmExtra = (distanceKm - 12) * 5;
+    }
   } else if (["93", "94", "77"].includes(department)) {
     if (distanceKm <= 7) { base = 95; zoneLabel = "Zone 2 (≤ 7km)"; } 
     else { base = 125; zoneLabel = "Zone 3 (> 7km)"; if (distanceKm > 12) kmExtra = (distanceKm - 12) * 3.8; }
