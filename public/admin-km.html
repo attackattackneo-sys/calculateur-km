@@ -29,7 +29,7 @@
     }
 
     .admin-container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
@@ -50,81 +50,6 @@
 
     .header h1 span { color: var(--orange); }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-      border: 1px solid var(--border);
-    }
-
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-
-    label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--muted);
-      margin-bottom: 0.4rem;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-suffix {
-      position: absolute;
-      right: 12px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      pointer-events: none;
-    }
-
-    input[type="number"],
-    input[type="text"],
-    textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 0.95rem;
-      transition: all 0.2s;
-      background: #fafafa;
-    }
-
-    input[type="number"] {
-      padding-right: 30px;
-    }
-
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: var(--orange);
-      background: #fff;
-      box-shadow: 0 0 0 3px var(--orange-light);
-    }
-
     .btn-save {
       background: var(--orange);
       color: white;
@@ -134,15 +59,110 @@
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+    }
+    .btn-save:hover { background: #e55c00; }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
     }
 
-    .btn-save:hover {
-      background: #e55c00;
-      transform: translateY(-1px);
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: #fafafa;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px var(--orange-light);
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+    .input-suffix {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* Tableau éditable des codes postaux */
+    .postal-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .postal-table th,
+    .postal-table td {
+      padding: 10px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .postal-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .postal-table input {
+      width: 100%;
+      border: 1px solid #ddd;
+      padding: 6px;
+      border-radius: 4px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .btn-row button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn-row button.delete {
+      background: #c0392b;
     }
 
     .toast {
@@ -159,32 +179,7 @@
       opacity: 0;
       transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
-
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    #publicGrid table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-      margin-bottom: 2rem;
-    }
-    #publicGrid th {
-      text-align: left;
-      padding: 8px;
-      border-bottom: 2px solid var(--orange);
-    }
-    #publicGrid td {
-      padding: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    @media (max-width: 768px) {
-      .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-      body { padding: 1rem; }
-    }
+    .toast.show { transform: translateY(0); opacity: 1; }
   </style>
 </head>
 <body>
@@ -192,376 +187,300 @@
 <div class="admin-container">
   <div class="header">
     <h1>Administration <span>Tarifs</span></h1>
-    <button class="btn-save" id="saveBtn">
-      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-      Enregistrer
-    </button>
+    <button class="btn-save" id="saveAllBtn">💾 Enregistrer</button>
   </div>
 
-  <form id="settingsForm" class="grid">
-    
-    <!-- Zone Studio -->
-    <div class="card">
-      <div class="card-title">🏠 Studio (Neuilly-sur-Marne)</div>
-      <div class="form-group">
-        <label>Forfait unique</label>
+  <!-- Grille zonale (paramètres généraux) -->
+  <div class="card">
+    <div class="card-title">📏 Paramètres des zones</div>
+    <div class="grid">
+      <div>
+        <h4 style="margin-bottom:0.5rem;">🏠 Studio (Neuilly‑sur‑Marne)</h4>
         <div class="input-wrapper">
           <input type="number" id="priceStudio" value="59" />
           <span class="input-suffix">€</span>
         </div>
       </div>
-    </div>
-
-    <!-- Zone Locale -->
-    <div class="card">
-      <div class="card-title">📍 Zone Locale</div>
-      <div class="form-group">
-        <label>Distance max. incluse (aller simple)</label>
-        <div class="input-wrapper">
-          <input type="number" id="localMaxKm" value="16" step="0.1" />
-          <span class="input-suffix">km</span>
+      <div>
+        <h4 style="margin-bottom:0.5rem;">📍 Zone Locale</h4>
+        <div class="form-group">
+          <label>Distance max (km)</label><input type="number" id="localMaxKm" value="8" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label>Temps max (min A/R)</label><input type="number" id="localMaxMin" value="15" />
+        </div>
+        <div class="form-group">
+          <label>Forfait (€)</label><input type="number" id="priceLocal" value="79" />
+        </div>
+        <div class="form-group">
+          <label>€/km sup.</label><input type="number" id="localExtraKmPrice" value="2.5" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label>€/min sup.</label><input type="number" id="localExtraMinPrice" value="1.5" step="0.1" />
         </div>
       </div>
-      <div class="form-group">
-        <label>Temps de trajet max. inclus (aller‑retour)</label>
-        <div class="input-wrapper">
-          <input type="number" id="localMaxMin" value="30" />
-          <span class="input-suffix">min</span>
+      <div>
+        <h4 style="margin-bottom:0.5rem;">🚗 Zone Métropolitaine</h4>
+        <div class="form-group">
+          <label>Distance max (km)</label><input type="number" id="metroMaxKm" value="10" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label>Temps max (min A/R)</label><input type="number" id="metroMaxMin" value="25" />
+        </div>
+        <div class="form-group">
+          <label>Forfait (€)</label><input type="number" id="priceMetro" value="129" />
+        </div>
+        <div class="form-group">
+          <label>€/km sup.</label><input type="number" id="metroExtraKmPrice" value="2.5" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label>€/min sup.</label><input type="number" id="metroExtraMinPrice" value="1.5" step="0.1" />
         </div>
       </div>
-      <div class="form-group">
-        <label>Forfait</label>
-        <div class="input-wrapper">
-          <input type="number" id="priceLocal" value="79" />
-          <span class="input-suffix">€</span>
+      <div>
+        <h4 style="margin-bottom:0.5rem;">🌍 Zone Étendue</h4>
+        <div class="form-group">
+          <label>Distance max (km)</label><input type="number" id="extendedMaxKm" value="12" step="0.1" />
         </div>
-      </div>
-      <div class="form-group">
-        <label>Prix par km supplémentaire</label>
-        <div class="input-wrapper">
-          <input type="number" id="localExtraKmPrice" value="2.5" step="0.1" />
-          <span class="input-suffix">€/km</span>
+        <div class="form-group">
+          <label>Temps max (min A/R)</label><input type="number" id="extendedMaxMin" value="45" />
         </div>
-      </div>
-      <div class="form-group">
-        <label>Prix par minute supplémentaire (A/R)</label>
-        <div class="input-wrapper">
-          <input type="number" id="localExtraMinPrice" value="1.5" step="0.1" />
-          <span class="input-suffix">€/min</span>
+        <div class="form-group">
+          <label>Forfait (€)</label><input type="number" id="priceExtended" value="179" />
         </div>
-      </div>
-    </div>
-
-    <!-- Zone Métropolitaine -->
-    <div class="card">
-      <div class="card-title">🚗 Zone Métropolitaine</div>
-      <div class="form-group">
-        <label>Distance max. incluse (aller simple)</label>
-        <div class="input-wrapper">
-          <input type="number" id="metroMaxKm" value="35" step="0.1" />
-          <span class="input-suffix">km</span>
+        <div class="form-group">
+          <label>Supplément Paris (€)</label><input type="number" id="parisSupplement" value="35" />
         </div>
-      </div>
-      <div class="form-group">
-        <label>Temps de trajet max. inclus (aller‑retour)</label>
-        <div class="input-wrapper">
-          <input type="number" id="metroMaxMin" value="50" />
-          <span class="input-suffix">min</span>
+        <div class="form-group">
+          <label>€/km sup.</label><input type="number" id="extendedExtraKmPrice" value="1.5" step="0.1" />
         </div>
-      </div>
-      <div class="form-group">
-        <label>Forfait</label>
-        <div class="input-wrapper">
-          <input type="number" id="priceMetro" value="129" />
-          <span class="input-suffix">€</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>€/km supplémentaire</label>
-        <div class="input-wrapper">
-          <input type="number" id="metroExtraKmPrice" value="2.0" step="0.1" />
-          <span class="input-suffix">€/km</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>€/min supplémentaire (A/R)</label>
-        <div class="input-wrapper">
-          <input type="number" id="metroExtraMinPrice" value="1.2" step="0.1" />
-          <span class="input-suffix">€/min</span>
+        <div class="form-group">
+          <label>€/min sup.</label><input type="number" id="extendedExtraMinPrice" value="1.5" step="0.1" />
         </div>
       </div>
     </div>
-
-    <!-- Zone Étendue -->
-    <div class="card">
-      <div class="card-title">🌍 Zone Étendue (Paris inclus)</div>
-      <div class="form-group">
-        <label>Distance max. incluse (aller simple)</label>
-        <div class="input-wrapper">
-          <input type="number" id="extendedMaxKm" value="50" step="0.1" />
-          <span class="input-suffix">km</span>
-        </div>
+    <h4 style="margin-top:1rem;">👥 Suppléments</h4>
+    <div class="grid">
+      <div>
+        <label>Bébé (€)</label><input type="number" id="priceBaby" value="15" />
       </div>
-      <div class="form-group">
-        <label>Temps de trajet max. inclus (aller‑retour)</label>
-        <div class="input-wrapper">
-          <input type="number" id="extendedMaxMin" value="75" />
-          <span class="input-suffix">min</span>
-        </div>
+      <div>
+        <label>Personne sup. (€)</label><input type="number" id="priceExtraPers" value="15" />
       </div>
-      <div class="form-group">
-        <label>Forfait</label>
-        <div class="input-wrapper">
-          <input type="number" id="priceExtended" value="179" />
-          <span class="input-suffix">€</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Supplément Paris intra-muros (si dép. 75)</label>
-        <div class="input-wrapper">
-          <input type="number" id="parisSupplement" value="30" />
-          <span class="input-suffix">€</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>€/km supplémentaire</label>
-        <div class="input-wrapper">
-          <input type="number" id="extendedExtraKmPrice" value="1.5" step="0.1" />
-          <span class="input-suffix">€/km</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>€/min supplémentaire (A/R)</label>
-        <div class="input-wrapper">
-          <input type="number" id="extendedExtraMinPrice" value="1.0" step="0.1" />
-          <span class="input-suffix">€/min</span>
-        </div>
+      <div>
+        <label>ANTS (€)</label><input type="number" id="priceAnts" value="5" />
       </div>
     </div>
+  </div>
 
-    <!-- Options & Suppléments -->
-    <div class="card">
-      <div class="card-title">👥 Options &amp; Suppléments</div>
-      <div class="form-group">
-        <label>Bébé (0-3 mois)</label>
-        <div class="input-wrapper">
-          <input type="number" id="priceBaby" value="15" />
-          <span class="input-suffix">€</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Personne supplémentaire</label>
-        <div class="input-wrapper">
-          <input type="number" id="priceExtraPers" value="15" />
-          <span class="input-suffix">€</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Photos ANTS</label>
-        <div class="input-wrapper">
-          <input type="number" id="priceAnts" value="5" />
-          <span class="input-suffix">€</span>
-        </div>
-      </div>
-    </div>
+  <!-- Tableau des forfaits par code postal -->
+  <div class="card">
+    <div class="card-title">📌 Forfaits directs par code postal</div>
+    <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
+      Ici vous pouvez définir un prix de déplacement forfaitaire pour un code postal spécifique.<br>
+      Si un code postal est listé, il aura priorité sur le calcul par zone. Laissez vide pour supprimer.
+    </p>
+    <table class="postal-table" id="postalTable">
+      <thead>
+        <tr>
+          <th>Code Postal</th>
+          <th>Prix déplacement (€)</th>
+          <th style="width: 80px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="postalTableBody">
+        <!-- Rows generated dynamically -->
+      </tbody>
+    </table>
+    <button id="addRowBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">+ Ajouter un code postal</button>
+  </div>
 
-  </form>
-
-  <!-- ==================== GRILLE TARIFAIRE PUBLIQUE ==================== -->
   <div class="card" id="publicGrid" style="margin-top: 2rem;">
     <div class="card-title">📋 Grille tarifaire publique (copie pour le site)</div>
-
-    <h3 style="font-family:'Playfair Display',serif; margin: 1.5rem 0 1rem; color: var(--primary);">
-      🚗 Tarifs de déplacement
-    </h3>
-    <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
-      Départ du studio : 16 boulevard Carnot, 93330 Neuilly-sur-Marne (93)
-    </p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Zone</th>
-          <th>Distance incluse (aller simple)</th>
-          <th>Temps inclus (aller‑retour)</th>
-          <th>Forfait</th>
-          <th>Au-delà (km)</th>
-          <th>Au-delà (min)</th>
-        </tr>
-      </thead>
-      <tbody id="gridBody">
-        <!-- Rempli dynamiquement -->
-      </tbody>
-    </table>
-
-    <h3 style="font-family:'Playfair Display',serif; margin: 1.5rem 0 1rem; color: var(--primary);">
-      👥 Suppléments &amp; Options
-    </h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Option</th>
-          <th>Prix unitaire</th>
-        </tr>
-      </thead>
-      <tbody id="supplementsBody">
-        <!-- Rempli dynamiquement -->
-      </tbody>
-    </table>
-
-    <p style="font-size:0.8rem; color: var(--muted); font-style: italic; background: var(--orange-light); padding: 10px 15px; border-radius: 8px;" id="exampleText">
-      <!-- Exemple dynamique -->
-    </p>
+    <div id="publicGridContent"></div>
   </div>
-  <!-- ==================== FIN GRILLE TARIFAIRE PUBLIQUE ==================== -->
-
 </div>
 
 <div class="toast" id="toast">✅ Paramètres mis à jour avec succès !</div>
 
 <script>
-  // Sauvegarde / chargement configuration admin
-  document.addEventListener('DOMContentLoaded', () => {
-    const savedConfig = localStorage.getItem('gregPricingV2');
-    if (savedConfig) {
-      const config = JSON.parse(savedConfig);
-      for (const [key, value] of Object.entries(config)) {
-        const el = document.getElementById(key);
-        if (el) el.value = value;
-      }
+  // Clé de stockage
+  const STORAGE_KEY = 'gregPricingV2';
+
+  // Structure par défaut
+  const defaultConfig = {
+    priceStudio: 59,
+    localMaxKm: 8, localMaxMin: 15, priceLocal: 79,
+    localExtraKmPrice: 2.5, localExtraMinPrice: 1.5,
+    metroMaxKm: 10, metroMaxMin: 25, priceMetro: 129,
+    metroExtraKmPrice: 2.5, metroExtraMinPrice: 1.5,
+    extendedMaxKm: 12, extendedMaxMin: 45, priceExtended: 179,
+    parisSupplement: 35,
+    extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1.5,
+    priceBaby: 15, priceExtraPers: 15, priceAnts: 5,
+    postalPrices: {} // { "93160": 79, "91210": 200, ... }
+  };
+
+  let currentConfig = JSON.parse(JSON.stringify(defaultConfig));
+
+  // Chargement
+  function loadConfig() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        currentConfig = JSON.parse(saved);
+      } catch (e) { currentConfig = JSON.parse(JSON.stringify(defaultConfig)); }
     }
+    // Remplir les champs de la grille zonale
+    document.getElementById('priceStudio').value = currentConfig.priceStudio;
+    document.getElementById('localMaxKm').value = currentConfig.localMaxKm;
+    document.getElementById('localMaxMin').value = currentConfig.localMaxMin;
+    document.getElementById('priceLocal').value = currentConfig.priceLocal;
+    document.getElementById('localExtraKmPrice').value = currentConfig.localExtraKmPrice;
+    document.getElementById('localExtraMinPrice').value = currentConfig.localExtraMinPrice;
+    document.getElementById('metroMaxKm').value = currentConfig.metroMaxKm;
+    document.getElementById('metroMaxMin').value = currentConfig.metroMaxMin;
+    document.getElementById('priceMetro').value = currentConfig.priceMetro;
+    document.getElementById('metroExtraKmPrice').value = currentConfig.metroExtraKmPrice;
+    document.getElementById('metroExtraMinPrice').value = currentConfig.metroExtraMinPrice;
+    document.getElementById('extendedMaxKm').value = currentConfig.extendedMaxKm;
+    document.getElementById('extendedMaxMin').value = currentConfig.extendedMaxMin;
+    document.getElementById('priceExtended').value = currentConfig.priceExtended;
+    document.getElementById('parisSupplement').value = currentConfig.parisSupplement;
+    document.getElementById('extendedExtraKmPrice').value = currentConfig.extendedExtraKmPrice;
+    document.getElementById('extendedExtraMinPrice').value = currentConfig.extendedExtraMinPrice;
+    document.getElementById('priceBaby').value = currentConfig.priceBaby;
+    document.getElementById('priceExtraPers').value = currentConfig.priceExtraPers;
+    document.getElementById('priceAnts').value = currentConfig.priceAnts;
+
+    renderPostalTable();
     updatePublicGrid();
-  });
+  }
 
-  document.getElementById('saveBtn').addEventListener('click', () => {
-    const config = {
-      priceStudio: Number(document.getElementById('priceStudio').value),
-      localMaxKm: Number(document.getElementById('localMaxKm').value),
-      localMaxMin: Number(document.getElementById('localMaxMin').value),
-      priceLocal: Number(document.getElementById('priceLocal').value),
-      localExtraKmPrice: Number(document.getElementById('localExtraKmPrice').value),
-      localExtraMinPrice: Number(document.getElementById('localExtraMinPrice').value),
-      metroMaxKm: Number(document.getElementById('metroMaxKm').value),
-      metroMaxMin: Number(document.getElementById('metroMaxMin').value),
-      priceMetro: Number(document.getElementById('priceMetro').value),
-      metroExtraKmPrice: Number(document.getElementById('metroExtraKmPrice').value),
-      metroExtraMinPrice: Number(document.getElementById('metroExtraMinPrice').value),
-      extendedMaxKm: Number(document.getElementById('extendedMaxKm').value),
-      extendedMaxMin: Number(document.getElementById('extendedMaxMin').value),
-      priceExtended: Number(document.getElementById('priceExtended').value),
-      parisSupplement: Number(document.getElementById('parisSupplement').value),
-      extendedExtraKmPrice: Number(document.getElementById('extendedExtraKmPrice').value),
-      extendedExtraMinPrice: Number(document.getElementById('extendedExtraMinPrice').value),
-      priceBaby: Number(document.getElementById('priceBaby').value),
-      priceExtraPers: Number(document.getElementById('priceExtraPers').value),
-      priceAnts: Number(document.getElementById('priceAnts').value)
-    };
+  // Sauvegarde
+  function saveConfig() {
+    // Lire les champs
+    currentConfig.priceStudio = parseFloat(document.getElementById('priceStudio').value) || 0;
+    currentConfig.localMaxKm = parseFloat(document.getElementById('localMaxKm').value) || 0;
+    currentConfig.localMaxMin = parseFloat(document.getElementById('localMaxMin').value) || 0;
+    currentConfig.priceLocal = parseFloat(document.getElementById('priceLocal').value) || 0;
+    currentConfig.localExtraKmPrice = parseFloat(document.getElementById('localExtraKmPrice').value) || 0;
+    currentConfig.localExtraMinPrice = parseFloat(document.getElementById('localExtraMinPrice').value) || 0;
+    currentConfig.metroMaxKm = parseFloat(document.getElementById('metroMaxKm').value) || 0;
+    currentConfig.metroMaxMin = parseFloat(document.getElementById('metroMaxMin').value) || 0;
+    currentConfig.priceMetro = parseFloat(document.getElementById('priceMetro').value) || 0;
+    currentConfig.metroExtraKmPrice = parseFloat(document.getElementById('metroExtraKmPrice').value) || 0;
+    currentConfig.metroExtraMinPrice = parseFloat(document.getElementById('metroExtraMinPrice').value) || 0;
+    currentConfig.extendedMaxKm = parseFloat(document.getElementById('extendedMaxKm').value) || 0;
+    currentConfig.extendedMaxMin = parseFloat(document.getElementById('extendedMaxMin').value) || 0;
+    currentConfig.priceExtended = parseFloat(document.getElementById('priceExtended').value) || 0;
+    currentConfig.parisSupplement = parseFloat(document.getElementById('parisSupplement').value) || 0;
+    currentConfig.extendedExtraKmPrice = parseFloat(document.getElementById('extendedExtraKmPrice').value) || 0;
+    currentConfig.extendedExtraMinPrice = parseFloat(document.getElementById('extendedExtraMinPrice').value) || 0;
+    currentConfig.priceBaby = parseFloat(document.getElementById('priceBaby').value) || 0;
+    currentConfig.priceExtraPers = parseFloat(document.getElementById('priceExtraPers').value) || 0;
+    currentConfig.priceAnts = parseFloat(document.getElementById('priceAnts').value) || 0;
 
-    localStorage.setItem('gregPricingV2', JSON.stringify(config));
-    console.log('✅ Configuration sauvegardée', config);
+    // Lire le tableau des codes postaux
+    const rows = document.querySelectorAll('#postalTableBody tr');
+    const postalPrices = {};
+    rows.forEach(row => {
+      const cpInput = row.querySelector('.cp-input');
+      const priceInput = row.querySelector('.price-input');
+      const code = cpInput.value.trim();
+      const price = parseFloat(priceInput.value);
+      if (code && !isNaN(price)) {
+        postalPrices[code] = price;
+      }
+    });
+    currentConfig.postalPrices = postalPrices;
 
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
+    showToast();
+    updatePublicGrid();
+  }
+
+  // Gestion du tableau des codes postaux
+  function renderPostalTable() {
+    const tbody = document.getElementById('postalTableBody');
+    tbody.innerHTML = '';
+    const entries = Object.entries(currentConfig.postalPrices || {});
+    entries.forEach(([code, price]) => {
+      addRow(code, price);
+    });
+    if (entries.length === 0) {
+      addRow('', ''); // ligne vide
+    }
+  }
+
+  function addRow(code = '', price = '') {
+    const tbody = document.getElementById('postalTableBody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input class="cp-input" type="text" value="${code}" placeholder="93160" /></td>
+      <td><input class="price-input" type="number" value="${price}" placeholder="Prix déplacement" /></td>
+      <td><button class="delete-row-btn" style="background:#c0392b; color:white; border:none; padding:6px 10px; border-radius:4px;">✕</button></td>
+    `;
+    row.querySelector('.delete-row-btn').addEventListener('click', () => {
+      row.remove();
+      // Si plus aucune ligne, ajouter une ligne vide
+      if (document.querySelectorAll('#postalTableBody tr').length === 0) {
+        addRow('', '');
+      }
+    });
+    tbody.appendChild(row);
+  }
+
+  document.getElementById('addRowBtn').addEventListener('click', () => addRow('', ''));
+  document.getElementById('saveAllBtn').addEventListener('click', saveConfig);
+
+  // Génération de la grille publique pour copier/coller
+  function updatePublicGrid() {
+    const cfg = currentConfig;
+    let html = `
+      <h3 style="font-family:'Playfair Display',serif;">🚗 Tarifs de déplacement</h3>
+      <p>Départ du studio : 16 bd Carnot, 93330 Neuilly-sur-Marne</p>
+      <table style="width:100%; border-collapse: collapse; font-size:0.9rem;">
+        <thead><tr style="border-bottom:2px solid var(--orange);"><th>Zone</th><th>Distance</th><th>Temps (A/R)</th><th>Forfait</th><th>Supplément km</th><th>Supplément min</th></tr></thead>
+        <tbody>
+          <tr><td>🏠 Studio (Neuilly)</td><td>−</td><td>−</td><td style="color:var(--orange);">${cfg.priceStudio} €</td><td>−</td><td>−</td></tr>
+          <tr><td>📍 Zone Locale</td><td>≤ ${cfg.localMaxKm} km</td><td>≤ ${cfg.localMaxMin} min</td><td style="color:var(--orange);">${cfg.priceLocal} €</td><td>+${cfg.localExtraKmPrice} €/km</td><td>+${cfg.localExtraMinPrice} €/min</td></tr>
+          <tr><td>🚗 Zone Métropolitaine</td><td>≤ ${cfg.metroMaxKm} km</td><td>≤ ${cfg.metroMaxMin} min</td><td style="color:var(--orange);">${cfg.priceMetro} €</td><td>+${cfg.metroExtraKmPrice} €/km</td><td>+${cfg.metroExtraMinPrice} €/min</td></tr>
+          <tr><td>🌍 Zone Étendue</td><td>≤ ${cfg.extendedMaxKm} km</td><td>≤ ${cfg.extendedMaxMin} min</td><td style="color:var(--orange);">${cfg.priceExtended} €</td><td>+${cfg.extendedExtraKmPrice} €/km</td><td>+${cfg.extendedExtraMinPrice} €/min</td></tr>
+          <tr><td>🗼 Supplément Paris</td><td colspan="5">+${cfg.parisSupplement} €</td></tr>
+        </tbody>
+      </table>
+      <h3>📋 Tarifs directs par code postal</h3>
+      <table style="width:100%; border-collapse: collapse; font-size:0.9rem;">
+        <thead><tr><th>Code Postal</th><th>Prix déplacement</th></tr></thead>
+        <tbody>
+    `;
+    if (cfg.postalPrices && Object.keys(cfg.postalPrices).length > 0) {
+      for (const [code, price] of Object.entries(cfg.postalPrices)) {
+        html += `<tr><td>${code}</td><td style="color:var(--orange);">${price} €</td></tr>`;
+      }
+    } else {
+      html += `<tr><td colspan="2">Aucun tarif direct défini</td></tr>`;
+    }
+    html += `</tbody></table>`;
+    html += `<h3>👥 Suppléments</h3>
+      <table style="width:100%; border-collapse: collapse; font-size:0.9rem;">
+        <tr><td>👶 Bébé</td><td style="color:var(--orange);">+${cfg.priceBaby} €</td></tr>
+        <tr><td>👤 Personne sup.</td><td style="color:var(--orange);">+${cfg.priceExtraPers} €</td></tr>
+        <tr><td>📸 ANTS</td><td style="color:var(--orange);">+${cfg.priceAnts} €</td></tr>
+      </table>
+    `;
+    document.getElementById('publicGridContent').innerHTML = html;
+  }
+
+  function showToast() {
     const toast = document.getElementById('toast');
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
-
-    updatePublicGrid();
-  });
-
-  // Met à jour la grille publique
-  function updatePublicGrid() {
-    const saved = localStorage.getItem('gregPricingV2');
-    if (!saved) return;
-    const cfg = JSON.parse(saved);
-
-    const zones = [
-      {
-        name: '🏠 Studio (Neuilly‑sur‑Marne)',
-        km: '−',
-        min: '−',
-        price: cfg.priceStudio + ' €',
-        extraKm: '−',
-        extraMin: '−'
-      },
-      {
-        name: '📍 Zone Locale',
-        km: cfg.localMaxKm + ' km',
-        min: cfg.localMaxMin + ' min',
-        price: cfg.priceLocal + ' €',
-        extraKm: '+' + cfg.localExtraKmPrice + ' €/km',
-        extraMin: '+' + cfg.localExtraMinPrice + ' €/min'
-      },
-      {
-        name: '🚗 Zone Métropolitaine',
-        km: cfg.metroMaxKm + ' km',
-        min: cfg.metroMaxMin + ' min',
-        price: cfg.priceMetro + ' €',
-        extraKm: '+' + cfg.metroExtraKmPrice + ' €/km',
-        extraMin: '+' + cfg.metroExtraMinPrice + ' €/min'
-      },
-      {
-        name: '🌍 Zone Étendue (Paris inclus)',
-        km: cfg.extendedMaxKm + ' km',
-        min: cfg.extendedMaxMin + ' min',
-        price: cfg.priceExtended + ' €',
-        extraKm: '+' + cfg.extendedExtraKmPrice + ' €/km',
-        extraMin: '+' + cfg.extendedExtraMinPrice + ' €/min'
-      }
-    ];
-
-    const gridBody = document.getElementById('gridBody');
-    gridBody.innerHTML = zones.map(z => `
-      <tr>
-        <td style="font-weight: 600;">${z.name}</td>
-        <td>${z.km}</td>
-        <td>${z.min}</td>
-        <td style="color: var(--orange); font-weight: 700;">${z.price}</td>
-        <td>${z.extraKm}</td>
-        <td>${z.extraMin}</td>
-      </tr>
-    `).join('') + `
-      <tr>
-        <td style="font-weight: 600;">🗼 Supplément Paris intra‑muros</td>
-        <td colspan="5" style="color: var(--orange); font-weight: 700;">+${cfg.parisSupplement} €</td>
-      </tr>
-    `;
-
-    const supplementsBody = document.getElementById('supplementsBody');
-    supplementsBody.innerHTML = `
-      <tr>
-        <td>👶 Bébé (0‑3 mois)</td>
-        <td style="color: var(--orange); font-weight: 700;">+${cfg.priceBaby} €</td>
-      </tr>
-      <tr>
-        <td>👤 Personne supplémentaire</td>
-        <td style="color: var(--orange); font-weight: 700;">+${cfg.priceExtraPers} €</td>
-      </tr>
-      <tr>
-        <td>📸 Photos ANTS</td>
-        <td style="color: var(--orange); font-weight: 700;">+${cfg.priceAnts} €</td>
-      </tr>
-    `;
-
-    // Exemple dynamique (Paris 11e, 22 km, durée simple estimée 45 min → A/R 90 min)
-    const distEx = 22;
-    const durSimpleEx = 45; // estimation
-    const durAREx = durSimpleEx * 2;
-    const depEx = "75";
-    const baseEx = cfg.priceExtended;
-    const supplementParisEx = cfg.parisSupplement;
-    const excessMinEx = Math.max(0, durAREx - cfg.extendedMaxMin);
-    const excessKmEx = Math.max(0, distEx - cfg.extendedMaxKm);
-    const kmCostEx = Math.round(excessKmEx * cfg.extendedExtraKmPrice);
-    const minCostEx = Math.round(excessMinEx * cfg.extendedExtraMinPrice);
-    const totalEx = baseEx + supplementParisEx + kmCostEx + minCostEx;
-
-    const exampleEl = document.getElementById('exampleText');
-    exampleEl.innerHTML = `
-      <strong>💡 Exemple :</strong> Pour une prestation à <strong>Paris 11<sup>e</sup></strong> (${distEx} km, ~${durSimpleEx} min de trajet simple 
-      soit <strong>${durAREx} min aller‑retour</strong>), le déplacement est facturé <strong>${totalEx} €</strong> 
-      (Zone Étendue : ${baseEx} € + supplément Paris ${supplementParisEx} € + ${excessMinEx} min × ${cfg.extendedExtraMinPrice} € 
-      ${excessKmEx > 0 ? '+ ' + excessKmEx + ' km × ' + cfg.extendedExtraKmPrice + ' €' : ''}).
-    `;
   }
+
+  // Initialisation
+  loadConfig();
 </script>
 
 </body>
