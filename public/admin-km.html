@@ -124,7 +124,6 @@
       font-size: 0.9rem;
     }
 
-    /* Tableau éditable des codes postaux */
     .postal-table {
       width: 100%;
       border-collapse: collapse;
@@ -147,22 +146,25 @@
       padding: 6px;
       border-radius: 4px;
     }
-    .btn-row {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .btn-row button {
-      background: var(--primary);
+    .delete-row-btn {
+      background: #c0392b;
       color: white;
       border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
+      padding: 6px 10px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 0.85rem;
     }
-    .btn-row button.delete {
-      background: #c0392b;
+
+    .config-output {
+      background: #1a1a1a;
+      color: #e0e0e0;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 1rem;
     }
 
     .toast {
@@ -177,7 +179,7 @@
       box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
       transform: translateY(100px);
       opacity: 0;
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: all 0.3s;
     }
     .toast.show { transform: translateY(0); opacity: 1; }
   </style>
@@ -190,124 +192,80 @@
     <button class="btn-save" id="saveAllBtn">💾 Enregistrer</button>
   </div>
 
-  <!-- Grille zonale (paramètres généraux) -->
+  <!-- Grille zonale -->
   <div class="card">
     <div class="card-title">📏 Paramètres des zones</div>
     <div class="grid">
       <div>
-        <h4 style="margin-bottom:0.5rem;">🏠 Studio (Neuilly‑sur‑Marne)</h4>
-        <div class="input-wrapper">
-          <input type="number" id="priceStudio" value="59" />
-          <span class="input-suffix">€</span>
-        </div>
+        <h4>🏠 Studio</h4>
+        <label>Forfait (€)</label><input type="number" id="priceStudio" value="59" />
       </div>
       <div>
-        <h4 style="margin-bottom:0.5rem;">📍 Zone Locale</h4>
-        <div class="form-group">
-          <label>Distance max (km)</label><input type="number" id="localMaxKm" value="8" step="0.1" />
-        </div>
-        <div class="form-group">
-          <label>Temps max (min A/R)</label><input type="number" id="localMaxMin" value="15" />
-        </div>
-        <div class="form-group">
-          <label>Forfait (€)</label><input type="number" id="priceLocal" value="79" />
-        </div>
-        <div class="form-group">
-          <label>€/km sup.</label><input type="number" id="localExtraKmPrice" value="2.5" step="0.1" />
-        </div>
-        <div class="form-group">
-          <label>€/min sup.</label><input type="number" id="localExtraMinPrice" value="1.5" step="0.1" />
-        </div>
+        <h4>📍 Zone Locale</h4>
+        <label>Distance max (km)</label><input type="number" id="localMaxKm" value="8" step="0.1" />
+        <label>Temps max (min A/R)</label><input type="number" id="localMaxMin" value="15" />
+        <label>Forfait (€)</label><input type="number" id="priceLocal" value="79" />
+        <label>€/km sup.</label><input type="number" id="localExtraKmPrice" value="2.5" step="0.1" />
+        <label>€/min sup.</label><input type="number" id="localExtraMinPrice" value="1.5" step="0.1" />
       </div>
       <div>
-        <h4 style="margin-bottom:0.5rem;">🚗 Zone Métropolitaine</h4>
-        <div class="form-group">
-          <label>Distance max (km)</label><input type="number" id="metroMaxKm" value="10" step="0.1" />
-        </div>
-        <div class="form-group">
-          <label>Temps max (min A/R)</label><input type="number" id="metroMaxMin" value="25" />
-        </div>
-        <div class="form-group">
-          <label>Forfait (€)</label><input type="number" id="priceMetro" value="129" />
-        </div>
-        <div class="form-group">
-          <label>€/km sup.</label><input type="number" id="metroExtraKmPrice" value="2.5" step="0.1" />
-        </div>
-        <div class="form-group">
-          <label>€/min sup.</label><input type="number" id="metroExtraMinPrice" value="1.5" step="0.1" />
-        </div>
+        <h4>🚗 Zone Métropolitaine</h4>
+        <label>Distance max (km)</label><input type="number" id="metroMaxKm" value="10" step="0.1" />
+        <label>Temps max (min A/R)</label><input type="number" id="metroMaxMin" value="25" />
+        <label>Forfait (€)</label><input type="number" id="priceMetro" value="129" />
+        <label>€/km sup.</label><input type="number" id="metroExtraKmPrice" value="2.5" step="0.1" />
+        <label>€/min sup.</label><input type="number" id="metroExtraMinPrice" value="1.5" step="0.1" />
       </div>
       <div>
-        <h4 style="margin-bottom:0.5rem;">🌍 Zone Étendue</h4>
-        <div class="form-group">
-          <label>Distance max (km)</label><input type="number" id="extendedMaxKm" value="12" step="0.1" />
-        </div>
-        <div class="form-group">
-          <label>Temps max (min A/R)</label><input type="number" id="extendedMaxMin" value="45" />
-        </div>
-        <div class="form-group">
-          <label>Forfait (€)</label><input type="number" id="priceExtended" value="179" />
-        </div>
-        <div class="form-group">
-          <label>Supplément Paris (€)</label><input type="number" id="parisSupplement" value="35" />
-        </div>
-        <div class="form-group">
-          <label>€/km sup.</label><input type="number" id="extendedExtraKmPrice" value="1.5" step="0.1" />
-        </div>
-        <div class="form-group">
-          <label>€/min sup.</label><input type="number" id="extendedExtraMinPrice" value="1.5" step="0.1" />
-        </div>
+        <h4>🌍 Zone Étendue</h4>
+        <label>Distance max (km)</label><input type="number" id="extendedMaxKm" value="12" step="0.1" />
+        <label>Temps max (min A/R)</label><input type="number" id="extendedMaxMin" value="45" />
+        <label>Forfait (€)</label><input type="number" id="priceExtended" value="179" />
+        <label>Supplément Paris (€)</label><input type="number" id="parisSupplement" value="35" />
+        <label>€/km sup.</label><input type="number" id="extendedExtraKmPrice" value="1.5" step="0.1" />
+        <label>€/min sup.</label><input type="number" id="extendedExtraMinPrice" value="1.5" step="0.1" />
       </div>
     </div>
     <h4 style="margin-top:1rem;">👥 Suppléments</h4>
     <div class="grid">
-      <div>
-        <label>Bébé (€)</label><input type="number" id="priceBaby" value="15" />
-      </div>
-      <div>
-        <label>Personne sup. (€)</label><input type="number" id="priceExtraPers" value="15" />
-      </div>
-      <div>
-        <label>ANTS (€)</label><input type="number" id="priceAnts" value="5" />
-      </div>
+      <div><label>Bébé (€)</label><input type="number" id="priceBaby" value="15" /></div>
+      <div><label>Personne sup. (€)</label><input type="number" id="priceExtraPers" value="15" /></div>
+      <div><label>ANTS (€)</label><input type="number" id="priceAnts" value="5" /></div>
     </div>
   </div>
 
-  <!-- Tableau des forfaits par code postal -->
+  <!-- Tableau codes postaux -->
   <div class="card">
     <div class="card-title">📌 Forfaits directs par code postal</div>
     <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
-      Ici vous pouvez définir un prix de déplacement forfaitaire pour un code postal spécifique.<br>
-      Si un code postal est listé, il aura priorité sur le calcul par zone. Laissez vide pour supprimer.
+      Définissez un prix de déplacement forfaitaire pour un code postal spécifique.<br>
+      Si un code postal est listé, il aura priorité sur le calcul par zone.
     </p>
-    <table class="postal-table" id="postalTable">
-      <thead>
-        <tr>
-          <th>Code Postal</th>
-          <th>Prix déplacement (€)</th>
-          <th style="width: 80px;">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="postalTableBody">
-        <!-- Rows generated dynamically -->
-      </tbody>
+    <table class="postal-table">
+      <thead><tr><th>Code Postal</th><th>Prix (€)</th><th style="width:80px;">Action</th></tr></thead>
+      <tbody id="postalTableBody"></tbody>
     </table>
-    <button id="addRowBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">+ Ajouter un code postal</button>
+    <button id="addRowBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">+ Ajouter</button>
   </div>
 
-  <div class="card" id="publicGrid" style="margin-top: 2rem;">
-    <div class="card-title">📋 Grille tarifaire publique (copie pour le site)</div>
-    <div id="publicGridContent"></div>
+  <!-- Générateur de config pour le site -->
+  <div class="card">
+    <div class="card-title">📋 Code à copier dans votre site</div>
+    <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
+      1. Modifiez les tarifs ci-dessus et cliquez sur <strong>Enregistrer</strong>.<br>
+      2. Copiez le bloc ci-dessous.<br>
+      3. Dans votre page <code>index.html</code> (intégration Google Sites), remplacez toute la fonction <code>getConfig()</code> par ce bloc.
+    </p>
+    <div class="config-output" id="configOutput"></div>
+    <button id="copyConfigBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">📋 Copier dans le presse-papier</button>
   </div>
 </div>
 
-<div class="toast" id="toast">✅ Paramètres mis à jour avec succès !</div>
+<div class="toast" id="toast">✅ Paramètres enregistrés</div>
 
 <script>
-  // Clé de stockage
   const STORAGE_KEY = 'gregPricingV2';
 
-  // Structure par défaut
   const defaultConfig = {
     priceStudio: 59,
     localMaxKm: 8, localMaxMin: 15, priceLocal: 79,
@@ -318,20 +276,16 @@
     parisSupplement: 35,
     extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1.5,
     priceBaby: 15, priceExtraPers: 15, priceAnts: 5,
-    postalPrices: {} // { "93160": 79, "91210": 200, ... }
+    postalPrices: {}
   };
 
   let currentConfig = JSON.parse(JSON.stringify(defaultConfig));
 
-  // Chargement
   function loadConfig() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      try {
-        currentConfig = JSON.parse(saved);
-      } catch (e) { currentConfig = JSON.parse(JSON.stringify(defaultConfig)); }
+      try { currentConfig = JSON.parse(saved); } catch (e) {}
     }
-    // Remplir les champs de la grille zonale
     document.getElementById('priceStudio').value = currentConfig.priceStudio;
     document.getElementById('localMaxKm').value = currentConfig.localMaxKm;
     document.getElementById('localMaxMin').value = currentConfig.localMaxMin;
@@ -352,14 +306,11 @@
     document.getElementById('priceBaby').value = currentConfig.priceBaby;
     document.getElementById('priceExtraPers').value = currentConfig.priceExtraPers;
     document.getElementById('priceAnts').value = currentConfig.priceAnts;
-
     renderPostalTable();
-    updatePublicGrid();
+    generateConfigCode();
   }
 
-  // Sauvegarde
   function saveConfig() {
-    // Lire les champs
     currentConfig.priceStudio = parseFloat(document.getElementById('priceStudio').value) || 0;
     currentConfig.localMaxKm = parseFloat(document.getElementById('localMaxKm').value) || 0;
     currentConfig.localMaxMin = parseFloat(document.getElementById('localMaxMin').value) || 0;
@@ -381,7 +332,6 @@
     currentConfig.priceExtraPers = parseFloat(document.getElementById('priceExtraPers').value) || 0;
     currentConfig.priceAnts = parseFloat(document.getElementById('priceAnts').value) || 0;
 
-    // Lire le tableau des codes postaux
     const rows = document.querySelectorAll('#postalTableBody tr');
     const postalPrices = {};
     rows.forEach(row => {
@@ -389,28 +339,21 @@
       const priceInput = row.querySelector('.price-input');
       const code = cpInput.value.trim();
       const price = parseFloat(priceInput.value);
-      if (code && !isNaN(price)) {
-        postalPrices[code] = price;
-      }
+      if (code && !isNaN(price)) postalPrices[code] = price;
     });
     currentConfig.postalPrices = postalPrices;
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
+    generateConfigCode();
     showToast();
-    updatePublicGrid();
   }
 
-  // Gestion du tableau des codes postaux
   function renderPostalTable() {
     const tbody = document.getElementById('postalTableBody');
     tbody.innerHTML = '';
     const entries = Object.entries(currentConfig.postalPrices || {});
-    entries.forEach(([code, price]) => {
-      addRow(code, price);
-    });
-    if (entries.length === 0) {
-      addRow('', ''); // ligne vide
-    }
+    entries.forEach(([code, price]) => addRow(code, price));
+    if (entries.length === 0) addRow('', '');
   }
 
   function addRow(code = '', price = '') {
@@ -419,67 +362,40 @@
     row.innerHTML = `
       <td><input class="cp-input" type="text" value="${code}" placeholder="93160" /></td>
       <td><input class="price-input" type="number" value="${price}" placeholder="Prix déplacement" /></td>
-      <td><button class="delete-row-btn" style="background:#c0392b; color:white; border:none; padding:6px 10px; border-radius:4px;">✕</button></td>
+      <td><button class="delete-row-btn">✕</button></td>
     `;
     row.querySelector('.delete-row-btn').addEventListener('click', () => {
       row.remove();
-      // Si plus aucune ligne, ajouter une ligne vide
-      if (document.querySelectorAll('#postalTableBody tr').length === 0) {
-        addRow('', '');
-      }
+      if (document.querySelectorAll('#postalTableBody tr').length === 0) addRow('', '');
     });
     tbody.appendChild(row);
   }
 
-  document.getElementById('addRowBtn').addEventListener('click', () => addRow('', ''));
-  document.getElementById('saveAllBtn').addEventListener('click', saveConfig);
-
-  // Génération de la grille publique pour copier/coller
-  function updatePublicGrid() {
+  function generateConfigCode() {
     const cfg = currentConfig;
-    let html = `
-      <h3 style="font-family:'Playfair Display',serif;">🚗 Tarifs de déplacement</h3>
-      <p>Départ du studio : 16 bd Carnot, 93330 Neuilly-sur-Marne</p>
-      <table style="width:100%; border-collapse: collapse; font-size:0.9rem;">
-        <thead><tr style="border-bottom:2px solid var(--orange);"><th>Zone</th><th>Distance</th><th>Temps (A/R)</th><th>Forfait</th><th>Supplément km</th><th>Supplément min</th></tr></thead>
-        <tbody>
-          <tr><td>🏠 Studio (Neuilly)</td><td>−</td><td>−</td><td style="color:var(--orange);">${cfg.priceStudio} €</td><td>−</td><td>−</td></tr>
-          <tr><td>📍 Zone Locale</td><td>≤ ${cfg.localMaxKm} km</td><td>≤ ${cfg.localMaxMin} min</td><td style="color:var(--orange);">${cfg.priceLocal} €</td><td>+${cfg.localExtraKmPrice} €/km</td><td>+${cfg.localExtraMinPrice} €/min</td></tr>
-          <tr><td>🚗 Zone Métropolitaine</td><td>≤ ${cfg.metroMaxKm} km</td><td>≤ ${cfg.metroMaxMin} min</td><td style="color:var(--orange);">${cfg.priceMetro} €</td><td>+${cfg.metroExtraKmPrice} €/km</td><td>+${cfg.metroExtraMinPrice} €/min</td></tr>
-          <tr><td>🌍 Zone Étendue</td><td>≤ ${cfg.extendedMaxKm} km</td><td>≤ ${cfg.extendedMaxMin} min</td><td style="color:var(--orange);">${cfg.priceExtended} €</td><td>+${cfg.extendedExtraKmPrice} €/km</td><td>+${cfg.extendedExtraMinPrice} €/min</td></tr>
-          <tr><td>🗼 Supplément Paris</td><td colspan="5">+${cfg.parisSupplement} €</td></tr>
-        </tbody>
-      </table>
-      <h3>📋 Tarifs directs par code postal</h3>
-      <table style="width:100%; border-collapse: collapse; font-size:0.9rem;">
-        <thead><tr><th>Code Postal</th><th>Prix déplacement</th></tr></thead>
-        <tbody>
-    `;
-    if (cfg.postalPrices && Object.keys(cfg.postalPrices).length > 0) {
-      for (const [code, price] of Object.entries(cfg.postalPrices)) {
-        html += `<tr><td>${code}</td><td style="color:var(--orange);">${price} €</td></tr>`;
-      }
-    } else {
-      html += `<tr><td colspan="2">Aucun tarif direct défini</td></tr>`;
-    }
-    html += `</tbody></table>`;
-    html += `<h3>👥 Suppléments</h3>
-      <table style="width:100%; border-collapse: collapse; font-size:0.9rem;">
-        <tr><td>👶 Bébé</td><td style="color:var(--orange);">+${cfg.priceBaby} €</td></tr>
-        <tr><td>👤 Personne sup.</td><td style="color:var(--orange);">+${cfg.priceExtraPers} €</td></tr>
-        <tr><td>📸 ANTS</td><td style="color:var(--orange);">+${cfg.priceAnts} €</td></tr>
-      </table>
-    `;
-    document.getElementById('publicGridContent').innerHTML = html;
+    const code = `
+// ⚠️ Ne pas modifier ce bloc manuellement. Copiez-le depuis l'admin.
+function getConfig() {
+  return ${JSON.stringify(cfg, null, 2)};
+}
+    `.trim();
+    document.getElementById('configOutput').textContent = code;
   }
 
-  function showToast() {
+  document.getElementById('addRowBtn').addEventListener('click', () => addRow('', ''));
+  document.getElementById('saveAllBtn').addEventListener('click', saveConfig);
+  document.getElementById('copyConfigBtn').addEventListener('click', () => {
+    const text = document.getElementById('configOutput').textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('📋 Code copié !'));
+  });
+
+  function showToast(msg = '✅ Paramètres enregistrés') {
     const toast = document.getElementById('toast');
+    toast.textContent = msg;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  // Initialisation
   loadConfig();
 </script>
 
