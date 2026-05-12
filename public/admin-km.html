@@ -212,7 +212,7 @@
     <button id="addRowBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">+ Ajouter</button>
   </div>
 
-  <!-- Bloc de configuration JS pour le site -->
+  <!-- Bloc de configuration JS -->
   <div class="card">
     <div class="card-title">📋 Code <code>getConfig()</code> à copier dans votre site</div>
     <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
@@ -224,9 +224,9 @@
 
   <!-- Texte brut pour Google Sites -->
   <div class="card">
-    <div class="card-title">📝 Texte brut pour Google Sites</div>
+    <div class="card-title">📝 Texte brut pour Google Sites <span style="font-weight:normal; font-size:0.8rem; color:var(--muted);">(se met à jour en direct)</span></div>
     <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
-      Ce texte peut être copié/collé directement dans l’éditeur de votre page. Il reflète les tarifs actuels.
+      Ce texte se met à jour automatiquement quand vous modifiez un champ. Vous pouvez le copier/coller directement dans l’éditeur de votre page.
     </p>
     <textarea id="plainTextOutput" class="plain-text-output" readonly></textarea>
     <button id="copyPlainTextBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">📋 Copier le texte brut</button>
@@ -254,6 +254,16 @@
 
   let currentConfig = JSON.parse(JSON.stringify(defaultConfig));
 
+  // Liste des IDs de champs à surveiller
+  const watchedFields = [
+    'priceStudio',
+    'localMaxKm', 'localMaxMin', 'priceLocal', 'localExtraKmPrice', 'localExtraMinPrice',
+    'metroMaxKm', 'metroMaxMin', 'priceMetro', 'metroExtraKmPrice', 'metroExtraMinPrice',
+    'extendedMaxKm', 'extendedMaxMin', 'priceExtended', 'parisSupplement',
+    'extendedExtraKmPrice', 'extendedExtraMinPrice',
+    'priceBaby', 'priceExtraPers', 'priceAnts'
+  ];
+
   function loadConfig() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -261,8 +271,7 @@
     }
     populateFields();
     renderPostalTable();
-    generateConfigCode();
-    generatePlainTextSummary();
+    refreshAllOutputs();
   }
 
   function populateFields() {
@@ -325,8 +334,7 @@
   function saveConfig() {
     readFieldsToConfig();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
-    generateConfigCode();
-    generatePlainTextSummary();
+    refreshAllOutputs();
     showToast();
   }
 
@@ -349,25 +357,48 @@
     row.querySelector('.delete-row-btn').addEventListener('click', () => {
       row.remove();
       if (document.querySelectorAll('#postalTableBody tr').length === 0) addRow('', '');
+      updateLiveOutputs(); // Mise à jour après suppression
     });
+    // Mise à jour lors de la saisie dans les champs code/prix
+    const cpInput = row.querySelector('.cp-input');
+    const priceInput = row.querySelector('.price-input');
+    cpInput.addEventListener('input', updateLiveOutputs);
+    priceInput.addEventListener('input', updateLiveOutputs);
     tbody.appendChild(row);
+  }
+
+  // --- Rafraîchissement des sorties ---
+  function refreshAllOutputs() {
+    generateConfigCode();
+    generatePlainTextSummary();
+  }
+
+  function updateLiveOutputs() {
+    // Relit tous les champs sans enregistrer dans localStorage
+    readFieldsToConfig();
+    refreshAllOutputs();
+  }
+
+  // Attacher les écouteurs en direct sur tous les champs de la grille
+  function attachLiveListeners() {
+    watchedFields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', updateLiveOutputs);
+      }
+    });
   }
 
   function generateConfigCode() {
     const cfg = JSON.parse(JSON.stringify(currentConfig));
-    const code = `
-// ⚠️ Ne pas modifier ce bloc manuellement. Copiez-le depuis l'admin.
-function getConfig() {
-  return ${JSON.stringify(cfg, null, 2)};
-}
-    `.trim();
+    const code = `// ⚠️ Ne pas modifier ce bloc manuellement. Copiez-le depuis l'admin.\nfunction getConfig() {\n  return ${JSON.stringify(cfg, null, 2)};\n}`;
     document.getElementById('configOutput').textContent = code;
   }
 
   // --- Génération du texte brut pour Google Sites ---
   function generatePlainTextSummary() {
     const cfg = currentConfig;
-    // Calcul de l'exemple Paris 11e (22 km, 45 min simple → 90 min A/R)
+    // Exemple Paris 11e : on garde une distance de 22 km et 45 min simple (90 min A/R)
     const dist = 22;
     const timeSimple = 45;
     const timeAR = timeSimple * 2;
@@ -386,13 +417,13 @@ function getConfig() {
     text += `  👶 Bébé 0-3 mois : +${cfg.priceBaby} €\n`;
     text += `  👤 Personne supplémentaire : +${cfg.priceExtraPers} €\n`;
     text += `  📸 Photos ANTS : +${cfg.priceAnts} €\n\n`;
-    text += `💡 Exemple Paris 11e (22 km, 45 min simple / 90 min A/R) : ${totalExample} €\n`;
+    text += `💡 Exemple Paris 11e (${dist} km, ${timeSimple} min simple / ${timeAR} min A/R) : ${totalExample} €\n`;
     text += `   Détail : ${base} € (base) + ${cfg.parisSupplement} € (Paris) + ${excessKm} km × ${cfg.extendedExtraKmPrice} € = ${kmCost} € + ${excessMin} min × ${cfg.extendedExtraMinPrice} € = ${minCost} € → Total ${totalExample} €`;
 
     document.getElementById('plainTextOutput').value = text;
   }
 
-  // --- Export JSON ---
+  // --- Export / Import JSON ---
   document.getElementById('exportBtn').addEventListener('click', () => {
     readFieldsToConfig();
     const json = JSON.stringify(currentConfig, null, 2);
@@ -406,7 +437,6 @@ function getConfig() {
     showToast('📤 Configuration exportée');
   });
 
-  // --- Import JSON ---
   document.getElementById('importBtn').addEventListener('click', () => {
     document.getElementById('importFileInput').click();
   });
@@ -426,8 +456,7 @@ function getConfig() {
         populateFields();
         renderPostalTable();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
-        generateConfigCode();
-        generatePlainTextSummary();
+        refreshAllOutputs();
         showToast('📥 Configuration importée');
       } catch (err) {
         alert('Erreur import : ' + err.message);
@@ -457,7 +486,9 @@ function getConfig() {
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
+  // Initialisation
   loadConfig();
+  attachLiveListeners();
 </script>
 
 </body>
