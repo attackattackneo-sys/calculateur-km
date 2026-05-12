@@ -156,26 +156,35 @@
 </div>
 
 <script>
-  // ----- STUDIO (coordonnées hardcodées) -----
-  const STUDIO_POSITION = { lat: 48.8582, lon: 2.5286 };  // 16 bd Carnot, Neuilly-sur-Marne
+  // ----- STUDIO (coordonnées fixes) -----
+  const STUDIO_POSITION = { lat: 48.8582, lon: 2.5286 };
 
-  const ORS_API_KEY = "5b3ce3597851110001cf6248";
-
-  // ----- Tarifs (lus depuis localStorage, avec fallback) -----
+  // ----- Lecture de la configuration (toujours depuis localStorage au moment du calcul) -----
   function getPricingConfig() {
-    const saved = localStorage.getItem('gregPricingV2');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+    try {
+      const saved = localStorage.getItem('gregPricingV2');
+      if (saved) {
+        const cfg = JSON.parse(saved);
+        // Vérification que les champs essentiels existent
+        if (cfg.priceLocal !== undefined) {
+          console.log('✅ Configuration chargée depuis localStorage', cfg);
+          return cfg;
+        }
+      }
+    } catch (e) {
+      console.error('Erreur lecture localStorage', e);
     }
+    // Fallback (ne devrait pas être utilisé si l'admin fonctionne)
+    console.warn('⚠️ Fallback : configuration par défaut');
     return {
       priceStudio: 59,
-      localMaxKm: 16, localMaxMin: 30, priceLocal: 79,
+      localMaxKm: 8, localMaxMin: 15, priceLocal: 79,
       localExtraKmPrice: 2.5, localExtraMinPrice: 1.5,
-      metroMaxKm: 35, metroMaxMin: 50, priceMetro: 129,
-      metroExtraKmPrice: 2.0, metroExtraMinPrice: 1.2,
-      extendedMaxKm: 50, extendedMaxMin: 75, priceExtended: 179,
-      parisSupplement: 30,
-      extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1.0,
+      metroMaxKm: 10, metroMaxMin: 25, priceMetro: 129,
+      metroExtraKmPrice: 2.5, metroExtraMinPrice: 1.5,
+      extendedMaxKm: 12, extendedMaxMin: 45, priceExtended: 179,
+      parisSupplement: 35,
+      extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1.5,
       priceBaby: 15, priceExtraPers: 15, priceAnts: 5
     };
   }
@@ -188,17 +197,27 @@
   }
   window.addEventListener('load', updateUIPrices);
   window.addEventListener('storage', (e) => {
-    if (e.key === 'gregPricingV2') updateUIPrices();
+    if (e.key === 'gregPricingV2') {
+      updateUIPrices();
+      // Optionnel : afficher un message
+      const out = document.getElementById('result');
+      if (out.classList.contains('visible')) {
+        out.innerHTML = '';
+        out.className = '';
+        document.getElementById('btn').textContent = 'Calculer mes frais (tarifs mis à jour)';
+      }
+    }
   });
 
   function round1(n) { return Math.round(n * 10) / 10; }
 
-  // ----- Logique de tarification -----
+  // ----- Logique de tarification (utilise TOUJOURS la config lue à l'instant) -----
   function computePrice(city, department, distanceKm, durationMinSimple) {
-    const cfg = getPricingConfig();
+    const cfg = getPricingConfig(); // lecture fraîche
     const lower = (city || "").trim().toLowerCase();
     const durationAR = durationMinSimple * 2;
 
+    // Studio
     if (lower.includes("neuilly-sur-marne")) {
       return {
         price: cfg.priceStudio,
@@ -210,6 +229,7 @@
     let zone, basePrice, includedKm, includedMin, extraKmPrice, extraMinPrice;
     let parisSurcharge = 0;
 
+    // Déterminer la zone selon les seuils (km ET temps)
     if (distanceKm <= cfg.localMaxKm && durationAR <= cfg.localMaxMin) {
       zone = "Locale";
       basePrice = cfg.priceLocal;
@@ -249,30 +269,28 @@
     return { price: total, zone, details };
   }
 
-  // ----- TABLE DE CORRESPONDANCE CODE POSTAL -> distance / temps MOYEN (aller simple) -----
-  // Valeurs mesurées depuis le studio (16 bd Carnot, 93330)
+  // ----- Table de correspondance Code Postal → distance / temps moyen (quand API HS) -----
   const FALLBACK_ESTIMATES = {
-    // Ville -> { km, min }
-    "93160": { km: 3.2, min: 10 },  // Noisy-le-Grand
-    "93330": { km: 0.0, min: 0 },   // Neuilly-sur-Marne
-    "93170": { km: 6.5, min: 18 },  // Bagnolet
-    "93100": { km: 8.0, min: 22 },  // Montreuil
-    "93200": { km: 12.0, min: 30 }, // Saint-Denis
-    "75001": { km: 16.0, min: 40 }, // Paris centre
+    "93160": { km: 3.2, min: 10 },
+    "93330": { km: 0, min: 0 },
+    "93170": { km: 6.5, min: 18 },
+    "93100": { km: 8.0, min: 22 },
+    "93200": { km: 12.0, min: 30 },
+    "75001": { km: 16.0, min: 40 },
     "75011": { km: 14.5, min: 38 },
     "75015": { km: 18.0, min: 45 },
     "75020": { km: 13.0, min: 35 },
-    "77500": { km: 22.0, min: 35 }, // Chelles
-    "77000": { km: 30.0, min: 45 }, // Melun
-    "91000": { km: 25.0, min: 40 }, // Évry
-    "92000": { km: 20.0, min: 35 }, // Nanterre
-    "94000": { km: 10.0, min: 25 }, // Créteil
-    // Ajoutez d'autres codes postaux si nécessaire
+    "77500": { km: 22.0, min: 35 },
+    "77000": { km: 30.0, min: 45 },
+    "91000": { km: 25.0, min: 40 },  // Évry
+    "91210": { km: 28.0, min: 48 },  // Draveil (ajouté pour le test)
+    "92000": { km: 20.0, min: 35 },
+    "94000": { km: 10.0, min: 25 },
   };
 
-  // ----- Géocodage : essayer Nominatim, sinon fallback code postal avec distances préenregistrées -----
+  // ----- Géocodage -----
   async function geocode(address) {
-    // 1. Essai Nominatim
+    // Essayer Nominatim
     try {
       const url = new URL("https://nominatim.openstreetmap.org/search");
       url.searchParams.set("q", address.includes("France") ? address : `${address}, France`);
@@ -297,18 +315,17 @@
         }
       }
     } catch (e) {
-      console.warn("Nominatim indisponible, fallback manuel", e);
+      console.warn("Nominatim échoue", e);
     }
 
-    // 2. Fallback : extraire le code postal
+    // Fallback code postal
     const postcodeMatch = address.match(/\b(\d{5})\b/);
     if (postcodeMatch) {
       const postcode = postcodeMatch[1];
       const dept = postcode.slice(0, 2);
-      // Si on a une entrée dans la table, on renvoie une position fictive mais avec les infos nécessaires
       if (FALLBACK_ESTIMATES[postcode]) {
         return {
-          lat: 0, lon: 0, // pas utilisé pour routage si on utilise le fallback ci‑dessous
+          lat: 0, lon: 0,
           city: postcode,
           department: dept,
           postcode: postcode,
@@ -316,7 +333,7 @@
           estimate: FALLBACK_ESTIMATES[postcode]
         };
       }
-      // Sinon, on utilise le centre du département (moins précis)
+      // Sinon, centre département (approximatif)
       const deptCenter = {
         "75": { lat: 48.8566, lon: 2.3522 },
         "77": { lat: 48.5399, lon: 2.6595 },
@@ -338,22 +355,22 @@
         };
       }
     }
-    throw new Error("Adresse introuvable. Veuillez saisir un code postal valide.");
+    throw new Error("Adresse introuvable. Essayez un code postal valide.");
   }
 
-  // ----- Routage : OpenRouteService ou vol d'oiseau -----
+  // ----- Routage -----
   async function routeORS(fromLat, fromLon, toLat, toLon) {
     const body = { coordinates: [[fromLon, fromLat], [toLon, toLat]], format: "json" };
     const url = "https://api.openrouteservice.org/v2/directions/driving-car";
     const r = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": ORS_API_KEY,
+        "Authorization": "5b3ce3597851110001cf6248",
         "Content-Type": "application/json"
       },
       body: JSON.stringify(body)
     });
-    if (!r.ok) throw new Error("Service de routage indisponible");
+    if (!r.ok) throw new Error("Service routage indisponible");
     const data = await r.json();
     if (!data.routes || !data.routes[0]) throw new Error("Itinéraire introuvable");
     return {
@@ -371,9 +388,8 @@
     return R * c;
   }
 
-  // Wrapper qui gère plusieurs fallbacks
   async function getRouteInfo(clientGeo) {
-    // Si le géocodage a déjà fourni une estimation directe (table postcode)
+    // Si on dispose d'une estimation forfaitaire (table postcode)
     if (clientGeo.useFallbackEstimate && clientGeo.estimate) {
       return {
         distanceKm: clientGeo.estimate.km,
@@ -382,15 +398,14 @@
       };
     }
 
-    // Sinon, on essaie ORS avec les coordonnées
+    // Sinon, essayer ORS
     try {
       return await routeORS(STUDIO_POSITION.lat, STUDIO_POSITION.lon, clientGeo.lat, clientGeo.lon);
     } catch (e) {
-      console.warn("ORS échoue, calcul à vol d'oiseau", e);
+      console.warn("ORS échoue, vol d'oiseau", e);
       const distCrow = crowFliesDistance(STUDIO_POSITION.lat, STUDIO_POSITION.lon, clientGeo.lat, clientGeo.lon);
-      // facteur correctif pour route réelle
       const estimatedDist = distCrow * 1.3;
-      const estimatedTime = (estimatedDist / 35) * 60; // 35 km/h moyen
+      const estimatedTime = (estimatedDist / 35) * 60;
       return {
         distanceKm: round1(estimatedDist),
         durationMinSimple: round1(estimatedTime),
@@ -399,7 +414,7 @@
     }
   }
 
-  // ----- Interface utilisateur -----
+  // ----- UI -----
   const btn = document.getElementById("btn");
   const resultDiv = document.getElementById("result");
 
@@ -423,26 +438,20 @@
     btn.textContent = "Recherche en cours..."; btn.disabled = true;
     
     try {
-      // Géocodage client (avec fallbacks)
       const clientGeo = await geocode(addr);
       if (!clientGeo) throw new Error("Adresse introuvable.");
 
-      // Calcul distance & temps (utilise la table si nécessaire)
       const route = await getRouteInfo(clientGeo);
       const distanceKm = route.distanceKm;
       const durationSimple = route.durationMinSimple;
       const durationAR = durationSimple * 2;
 
-      // Vérification anti‑zéro
       if (distanceKm === 0 && !clientGeo.useFallbackEstimate) {
-        // Si zéro et pas de table, message d'erreur
-        throw new Error("Impossible de calculer la distance pour cette adresse. Essayez un code postal voisin.");
+        throw new Error("Impossible de déterminer la distance. Vérifiez l'adresse.");
       }
 
-      const city = clientGeo.city || addr;
-      const department = clientGeo.department;
-      const pricing = computePrice(city, department, distanceKm, durationSimple);
-
+      // Utilisation de la config fraîche pour le calcul
+      const pricing = computePrice(clientGeo.city || addr, clientGeo.department, distanceKm, durationSimple);
       const cfg = getPricingConfig();
       const babies = parseInt(document.getElementById("babies").value) || 0;
       const persons = parseInt(document.getElementById("persons").value) || 0;
@@ -466,7 +475,7 @@
       }
 
       showResult(`
-        <p style="font-size:0.75rem;text-transform:uppercase;color:#888;">${city} – ${distanceKm} km, ${durationSimple} min (simple) / ${durationAR} min (A/R)</p>
+        <p style="font-size:0.75rem;text-transform:uppercase;color:#888;">${clientGeo.city || addr} – ${distanceKm} km, ${durationSimple} min (simple) / ${durationAR} min (A/R)</p>
         <p class="result-price" style="margin:10px 0;">€${grandTotal}</p>
         <div style="margin-top:20px;padding-top:15px;border-top:1px dashed #ebebeb;">${detailsHtml}</div>
         <div class="result-meta">Zone : ${pricing.zone}</div>
@@ -479,6 +488,9 @@
       btn.textContent = "Calculer mes frais"; btn.disabled = false;
     }
   });
+
+  // Vérification initiale dans la console
+  console.log('Config initiale :', getPricingConfig());
 </script>
 
 </body>
