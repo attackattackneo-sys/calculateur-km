@@ -138,31 +138,35 @@
 
 <script>
   // =================== CONFIGURATION (modifiable) ===================
-  function getConfig() {
-    return {
-      "priceStudio": 59,
-      "localMaxKm": 6,
-      "localMaxMin": 20,
-      "priceLocal": 79,
-      "localExtraKmPrice": 2.5,
-      "localExtraMinPrice": 1.5,
-      "metroMaxKm": 10,
-      "metroMaxMin": 35,
-      "priceMetro": 129,
-      "metroExtraKmPrice": 2.5,
-      "metroExtraMinPrice": 1.5,
-      "extendedMaxKm": 12,
-      "extendedMaxMin": 45,
-      "priceExtended": 179,
-      "parisSupplement": 35,
-      "extendedExtraKmPrice": 1,
-      "extendedExtraMinPrice": 1,
-      "priceBaby": 15,
-      "priceExtraPers": 15,
-      "priceAnts": 5,
-      "postalPrices": {"77500": 95}
-    };
+// ⚠️ Ne pas modifier ce bloc manuellement. Copiez-le depuis l'admin.
+function getConfig() {
+  return {
+  "priceStudio": 59,
+  "localMaxKm": 6,
+  "localMaxMin": 20,
+  "priceLocal": 79,
+  "localExtraKmPrice": 2,
+  "localExtraMinPrice": 1.5,
+  "metroMaxKm": 10,
+  "metroMaxMin": 35,
+  "priceMetro": 129,
+  "metroExtraKmPrice": 2,
+  "metroExtraMinPrice": 1.5,
+  "extendedMaxKm": 15,
+  "extendedMaxMin": 45,
+  "priceExtended": 179,
+  "parisSupplement": 35,
+  "extendedExtraKmPrice": 1,
+  "extendedExtraMinPrice": 1,
+  "priceBaby": 15,
+  "priceExtraPers": 15,
+  "priceAnts": 5,
+  "postalPrices": {
+    "77500": 95,
+    "93160": 95
   }
+};
+}
 
   const STUDIO_POSITION = { lat: 48.8582, lon: 2.5286 };
   const CITY_POSTCODE = {
