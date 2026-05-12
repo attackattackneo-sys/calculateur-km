@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    /* Styles identiques à votre version précédente */
     :root {
       --primary: #1a1a1a;
       --orange: #ff6600;
@@ -19,9 +18,7 @@
       --border: #ebebeb;
       --radius: 16px;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
@@ -31,7 +28,6 @@
       justify-content: center;
       padding: 1.5rem;
     }
-
     .card {
       background: var(--card);
       border-radius: 24px;
@@ -40,7 +36,6 @@
       max-width: 480px;
       overflow: hidden;
     }
-
     .card-header {
       padding: 2rem 2rem 1.5rem;
       border-bottom: 1px solid var(--border);
@@ -59,24 +54,19 @@
     }
     h1 { font-family: 'Playfair Display', serif; font-size: 1.65rem; color: var(--primary); }
     h1 span { color: var(--orange); }
-
     .card-body { padding: 1.75rem 2rem; }
-
     .field { margin-bottom: 1.25rem; }
     .field label {
       display: block; font-size: 0.72rem; font-weight: 600;
       text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem;
     }
     .field label .tip { font-weight: 400; text-transform: none; color: #bbb; font-size: 0.7rem; margin-left: 0.3rem; }
-    
     input[type="text"] {
       width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
       border-radius: 10px; font-family: inherit; font-size: 0.95rem;
     }
     input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-glow); }
-
     .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
-
     .number-ctrl {
       display: flex; align-items: center; border: 1.5px solid var(--border);
       border-radius: 10px; overflow: hidden; background: #fdfdfd;
@@ -88,38 +78,32 @@
     .number-ctrl input {
       flex: 1; border: none; text-align: center; font-weight: 600; width: 30px;
     }
-
     .btn-calc {
       width: 100%; padding: 14px; background: var(--orange); color: #fff;
       border: none; border-radius: 12px; font-weight: 600; cursor: pointer;
       box-shadow: 0 4px 14px var(--orange-glow);
     }
     .btn-calc:hover { background: #e55c00; transform: translateY(-1px); }
-
     #result { overflow: hidden; max-height: 0; transition: max-height 0.4s ease; }
     #result.visible { max-height: 600px; }
     .result-inner { border-top: 1px solid var(--border); padding: 1.5rem 2rem; }
     .result-inner.ok { background: var(--orange-light); }
     .result-price { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: var(--orange); }
     .result-meta { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-top: 8px; }
-    
     .card-note { padding: 1rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: #bbb; text-align: center; }
   </style>
 </head>
 <body>
-
 <div class="card">
   <div class="card-header">
     <p class="logo-line">GregPhotographe &mdash; Studio</p>
     <h1>Estimation des <span>frais</span></h1>
   </div>
-
   <div class="card-body">
     <div class="field">
       <label for="address">Lieu de la prestation</label>
       <input id="address" type="text" placeholder="Ville ou code postal…" />
     </div>
-
     <div class="row-grid">
       <div class="field">
         <label>Bébés (0-3m) <span class="tip">+<span id="babyUnitPrice">15</span>€</span></label>
@@ -138,7 +122,6 @@
         </div>
       </div>
     </div>
-
     <div class="field">
       <label>Photos ANTS <span class="tip">+<span id="antsUnitPrice">5</span>€ / pers.</span></label>
       <div class="number-ctrl">
@@ -147,46 +130,41 @@
         <button type="button" data-target="ants" data-op="plus">+</button>
       </div>
     </div>
-
     <button id="btn" class="btn-calc">Calculer mes frais</button>
   </div>
-
   <div id="result"></div>
   <p class="card-note">Itinéraire calculé depuis le studio à Neuilly-sur-Marne</p>
 </div>
 
 <script>
-  // ======================== CONFIGURATION (COLLÉE DEPUIS L'ADMIN) ========================
-// ⚠️ Ne pas modifier ce bloc manuellement. Copiez-le depuis l'admin.
-function getConfig() {
-  return {
-  "priceStudio": 59,
-  "localMaxKm": 7,6,
-  "localMaxMin": 15,
-  "priceLocal": 79,
-  "localExtraKmPrice": 2,
-  "localExtraMinPrice": 1.5,
-  "metroMaxKm": 8.5,
-  "metroMaxMin": 30,
-  "priceMetro": 129,
-  "metroExtraKmPrice": 2,
-  "metroExtraMinPrice": 1.5,
-  "extendedMaxKm": 15,
-  "extendedMaxMin": 45,
-  "priceExtended": 179,
-  "parisSupplement": 35,
-  "extendedExtraKmPrice": 1.1,
-  "extendedExtraMinPrice": 1,
-  "priceBaby": 15,
-  "priceExtraPers": 15,
-  "priceAnts": 5,
-  "postalPrices": {}
-};
-}
-  // =====================================================================================
+  // =================== CONFIGURATION (modifiable) ===================
+  function getConfig() {
+    return {
+      "priceStudio": 59,
+      "localMaxKm": 8,
+      "localMaxMin": 15,
+      "priceLocal": 79,
+      "localExtraKmPrice": 2.5,
+      "localExtraMinPrice": 1.5,
+      "metroMaxKm": 10,
+      "metroMaxMin": 25,
+      "priceMetro": 129,
+      "metroExtraKmPrice": 2.5,
+      "metroExtraMinPrice": 1.5,
+      "extendedMaxKm": 12,
+      "extendedMaxMin": 45,
+      "priceExtended": 179,
+      "parisSupplement": 35,
+      "extendedExtraKmPrice": 1.5,
+      "extendedExtraMinPrice": 1.5,
+      "priceBaby": 15,
+      "priceExtraPers": 15,
+      "priceAnts": 5,
+      "postalPrices": {}
+    };
+  }
 
   const STUDIO_POSITION = { lat: 48.8582, lon: 2.5286 };
-
   const CITY_POSTCODE = {
     "melun": "77000", "paris": "75000", "evry": "91000", "nanterre": "92000",
     "creteil": "94000", "noisy-le-grand": "93160", "chelles": "77500",
@@ -283,34 +261,69 @@ function getConfig() {
 
   function computePrice(distanceKm, durationMinSimple, department, city) {
     const cfg = getConfig();
+    // Tarif postal prioritaire
     if (city && cfg.postalPrices[city]) {
+      console.log(`Tarif direct postal ${city} : ${cfg.postalPrices[city]} €`);
       return { price: cfg.postalPrices[city], zone: "Tarif direct", details: [`Tarif direct ${city} : ${cfg.postalPrices[city]} €`] };
     }
+    // Studio
     if ((city || "").includes("93330") || (city || "").toLowerCase().includes("neuilly-sur-marne")) {
+      console.log("Studio Neuilly-sur-Marne");
       return { price: cfg.priceStudio, zone: "Studio", details: [`Studio : ${cfg.priceStudio} €`] };
     }
+
     const durationAR = durationMinSimple * 2;
+    console.log(`Distance : ${distanceKm} km, Temps A/R : ${durationAR} min`);
+    console.log(`Seuils Locale : km≤${cfg.localMaxKm} ET min≤${cfg.localMaxMin}`);
+    console.log(`Seuils Métropolitaine : km≤${cfg.metroMaxKm} ET min≤${cfg.metroMaxMin}`);
+
     let zone, basePrice, includedKm, includedMin, extraKmPrice, extraMinPrice, parisSurcharge = 0;
+
     if (distanceKm <= cfg.localMaxKm && durationAR <= cfg.localMaxMin) {
-      zone = "Locale"; basePrice = cfg.priceLocal; includedKm = cfg.localMaxKm; includedMin = cfg.localMaxMin;
-      extraKmPrice = cfg.localExtraKmPrice; extraMinPrice = cfg.localExtraMinPrice;
+      zone = "Locale";
+      basePrice = cfg.priceLocal;
+      includedKm = cfg.localMaxKm;
+      includedMin = cfg.localMaxMin;
+      extraKmPrice = cfg.localExtraKmPrice;
+      extraMinPrice = cfg.localExtraMinPrice;
+      console.log("Zone Locale sélectionnée");
     } else if (distanceKm <= cfg.metroMaxKm && durationAR <= cfg.metroMaxMin) {
-      zone = "Métropolitaine"; basePrice = cfg.priceMetro; includedKm = cfg.metroMaxKm; includedMin = cfg.metroMaxMin;
-      extraKmPrice = cfg.metroExtraKmPrice; extraMinPrice = cfg.metroExtraMinPrice;
+      zone = "Métropolitaine";
+      basePrice = cfg.priceMetro;
+      includedKm = cfg.metroMaxKm;
+      includedMin = cfg.metroMaxMin;
+      extraKmPrice = cfg.metroExtraKmPrice;
+      extraMinPrice = cfg.metroExtraMinPrice;
+      console.log("Zone Métropolitaine sélectionnée");
     } else {
-      zone = "Étendue"; basePrice = cfg.priceExtended; includedKm = cfg.extendedMaxKm; includedMin = cfg.extendedMaxMin;
-      extraKmPrice = cfg.extendedExtraKmPrice; extraMinPrice = cfg.extendedExtraMinPrice;
-      if (department === "75") parisSurcharge = cfg.parisSupplement;
+      zone = "Étendue";
+      basePrice = cfg.priceExtended;
+      includedKm = cfg.extendedMaxKm;
+      includedMin = cfg.extendedMaxMin;
+      extraKmPrice = cfg.extendedExtraKmPrice;
+      extraMinPrice = cfg.extendedExtraMinPrice;
+      if (department === "75") {
+        parisSurcharge = cfg.parisSupplement;
+        console.log("Supplément Paris appliqué");
+      }
+      console.log("Zone Étendue sélectionnée");
     }
+
     const excessKm = Math.max(0, distanceKm - includedKm);
     const excessMin = Math.max(0, durationAR - includedMin);
     const kmCost = Math.round(excessKm * extraKmPrice * 10) / 10;
     const minCost = Math.round(excessMin * extraMinPrice * 10) / 10;
     const total = Math.round(basePrice + kmCost + minCost + parisSurcharge);
+
+    console.log(`Excédent km : ${excessKm.toFixed(1)} -> ${kmCost.toFixed(1)} €`);
+    console.log(`Excédent min : ${excessMin.toFixed(1)} -> ${minCost.toFixed(1)} €`);
+    console.log(`Total : ${total} €`);
+
     const details = [`Zone ${zone} — ${basePrice} €`];
     if (excessKm > 0) details.push(`+ ${excessKm.toFixed(1)} km × ${extraKmPrice} € = ${kmCost.toFixed(1)} €`);
     if (excessMin > 0) details.push(`+ ${excessMin.toFixed(1)} min (A/R) × ${extraMinPrice} € = ${minCost.toFixed(1)} €`);
     if (parisSurcharge > 0) details.push(`Supplément Paris : +${parisSurcharge} €`);
+
     return { price: total, zone, details };
   }
 
@@ -337,6 +350,7 @@ function getConfig() {
       const clientGeo = await geocode(address);
       if (!clientGeo) throw new Error("Adresse introuvable");
       const route = await routeORS(STUDIO_POSITION.lat, STUDIO_POSITION.lon, clientGeo.lat, clientGeo.lon);
+      console.log(`Résultat API : ${route.distanceKm} km, ${route.durationMinSimple} min simple`);
       const pricing = computePrice(route.distanceKm, route.durationMinSimple, clientGeo.department, clientGeo.postcode || clientGeo.city);
       const cfg = getConfig();
       const babies = parseInt(document.getElementById("babies").value) || 0;
