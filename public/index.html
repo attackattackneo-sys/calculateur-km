@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    /* Styles identiques à votre version précédente */
     :root {
       --primary: #1a1a1a;
       --orange: #ff6600;
@@ -155,29 +156,44 @@
 </div>
 
 <script>
-  // ----- STUDIO (coordonnées exactes) -----
+  // ======================== CONFIGURATION (COLLÉE DEPUIS L'ADMIN) ========================
+// ⚠️ Ne pas modifier ce bloc manuellement. Copiez-le depuis l'admin.
+function getConfig() {
+  return {
+  "priceStudio": 59,
+  "localMaxKm": 7,
+  "localMaxMin": 20,
+  "priceLocal": 79,
+  "localExtraKmPrice": 2.5,
+  "localExtraMinPrice": 1.5,
+  "metroMaxKm": 10,
+  "metroMaxMin": 30,
+  "priceMetro": 129,
+  "metroExtraKmPrice": 2.5,
+  "metroExtraMinPrice": 1.5,
+  "extendedMaxKm": 15,
+  "extendedMaxMin": 45,
+  "priceExtended": 179,
+  "parisSupplement": 35,
+  "extendedExtraKmPrice": 1.2,
+  "extendedExtraMinPrice": 1.2,
+  "priceBaby": 15,
+  "priceExtraPers": 15,
+  "priceAnts": 5,
+  "postalPrices": {}
+};
+}
+  // =====================================================================================
+
   const STUDIO_POSITION = { lat: 48.8582, lon: 2.5286 };
 
-  // ----- CONFIGURATION (depuis localStorage) -----
-  function getConfig() {
-    const saved = localStorage.getItem('gregPricingV2');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
-    // Fallback (valeurs identiques à votre admin actuelle)
-    return {
-      priceStudio: 59,
-      localMaxKm: 8, localMaxMin: 15, priceLocal: 79,
-      localExtraKmPrice: 2.5, localExtraMinPrice: 1.5,
-      metroMaxKm: 10, metroMaxMin: 25, priceMetro: 129,
-      metroExtraKmPrice: 2.5, metroExtraMinPrice: 1.5,
-      extendedMaxKm: 12, extendedMaxMin: 45, priceExtended: 179,
-      parisSupplement: 35,
-      extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1.5,
-      priceBaby: 15, priceExtraPers: 15, priceAnts: 5,
-      postalPrices: {}
-    };
-  }
+  const CITY_POSTCODE = {
+    "melun": "77000", "paris": "75000", "evry": "91000", "nanterre": "92000",
+    "creteil": "94000", "noisy-le-grand": "93160", "chelles": "77500",
+    "neuilly-sur-marne": "93330", "gagny": "93220", "le perreux-sur-marne": "94170",
+    "gournay-sur-marne": "93460", "bagnolet": "93170", "montreuil": "93100",
+    "saint-denis": "93200", "tremblay-en-france": "93290", "bondy": "93140"
+  };
 
   function updateUIPrices() {
     const cfg = getConfig();
@@ -185,29 +201,9 @@
     document.getElementById('persUnitPrice').textContent = cfg.priceExtraPers;
     document.getElementById('antsUnitPrice').textContent = cfg.priceAnts;
   }
-
   window.addEventListener('load', updateUIPrices);
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'gregPricingV2') updateUIPrices();
-  });
-
-  // ----- GÉOCODAGE (Nominatim avec fallback code postal) -----
-  const CITY_POSTCODE = {
-    "melun": "77000", "paris": "75000", "evry": "91000", "nanterre": "92000",
-    "creteil": "94000", "noisy-le-grand": "93160", "chelles": "77500",
-    "neuilly-sur-marne": "93330", "gagny": "93220", "le perreux-sur-marne": "94170",
-    "gournay-sur-marne": "93460", "bagnolet": "93170", "montreuil": "93100",
-    "saint-denis": "93200", "tremblay-en-france": "93290", "bondy": "93140",
-    "aubay-sous-bois": "93600", "bobigny": "93000", "drancy": "93700",
-    "le raincy": "93340", "livry-gargan": "93190", "montfermeil": "93370",
-    "neuilly-plaisance": "93360", "noisy-le-sec": "93130", "pantin": "93500",
-    "rosny-sous-bois": "93110", "villemomble": "93250", "vincennes": "94300",
-    "saint-maur-des-fosses": "94100", "ivry-sur-seine": "94200", "vitry-sur-seine": "94400",
-    // complétez selon vos besoins
-  };
 
   async function geocode(address) {
-    // 1. Essayer Nominatim
     try {
       const url = new URL("https://nominatim.openstreetmap.org/search");
       url.searchParams.set("q", `${address}, France`);
@@ -216,11 +212,11 @@
       url.searchParams.set("limit", "1");
       url.searchParams.set("countrycodes", "fr");
       const r = await fetch(url.toString(), {
-        headers: { "User-Agent": "GregPhotographe-km-calculator/1.0" }
+        headers: { "User-Agent": "GregPhotographe/1.0" }
       });
       if (r.ok) {
         const data = await r.json();
-        if (Array.isArray(data) && data[0]) {
+        if (data[0]) {
           const a = data[0].address || {};
           return {
             lat: Number(data[0].lat),
@@ -231,58 +227,27 @@
           };
         }
       }
-    } catch (e) {
-      console.warn("Nominatim indisponible, fallback");
-    }
-
-    // 2. Fallback : trouver un code postal
+    } catch (e) {}
     const cleaned = address.trim().toLowerCase();
-    let postcode = null;
-    // extraire 5 chiffres
-    const match = cleaned.match(/\b(\d{5})\b/);
-    if (match) postcode = match[1];
-    else {
-      // chercher dans la table ville -> CP
-      for (const [city, cp] of Object.entries(CITY_POSTCODE)) {
-        if (cleaned.includes(city)) {
-          postcode = cp;
-          break;
-        }
-      }
-    }
+    let postcode = cleaned.match(/\b(\d{5})\b/)?.[1] || CITY_POSTCODE[cleaned] || null;
     if (!postcode) throw new Error("Adresse introuvable");
     const dept = postcode.slice(0, 2);
-    const deptCenter = {
-      "75": { lat: 48.8566, lon: 2.3522 },
-      "77": { lat: 48.5399, lon: 2.6595 },
-      "78": { lat: 48.8014, lon: 2.1303 },
-      "91": { lat: 48.5839, lon: 2.3081 },
-      "92": { lat: 48.8924, lon: 2.2153 },
-      "93": { lat: 48.9316, lon: 2.3976 },
-      "94": { lat: 48.7846, lon: 2.4238 },
-      "95": { lat: 49.0375, lon: 2.0749 }
+    const centers = {
+      "75": { lat: 48.8566, lon: 2.3522 }, "77": { lat: 48.5399, lon: 2.6595 },
+      "78": { lat: 48.8014, lon: 2.1303 }, "91": { lat: 48.5839, lon: 2.3081 },
+      "92": { lat: 48.8924, lon: 2.2153 }, "93": { lat: 48.9316, lon: 2.3976 },
+      "94": { lat: 48.7846, lon: 2.4238 }, "95": { lat: 49.0375, lon: 2.0749 }
     };
-    if (deptCenter[dept]) {
-      return {
-        lat: deptCenter[dept].lat,
-        lon: deptCenter[dept].lon,
-        city: postcode,
-        department: dept,
-        postcode: postcode,
-        approximate: true
-      };
-    }
-    throw new Error("Département inconnu");
+    if (!centers[dept]) throw new Error("Département inconnu");
+    return { ...centers[dept], city: postcode, department: dept, postcode, approximate: true };
   }
 
-  // ----- ROUTAGE : OpenRouteService ou vol d'oiseau -----
   async function routeORS(fromLat, fromLon, toLat, toLon) {
     const body = { coordinates: [[fromLon, fromLat], [toLon, toLat]], format: "json" };
-    const url = "https://api.openrouteservice.org/v2/directions/driving-car";
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
     try {
-      const r = await fetch(url, {
+      const r = await fetch("https://api.openrouteservice.org/v2/directions/driving-car", {
         method: "POST",
         headers: {
           "Authorization": "5b3ce3597851110001cf6248",
@@ -294,96 +259,63 @@
       clearTimeout(timeout);
       if (!r.ok) throw new Error("ORS indisponible");
       const data = await r.json();
-      if (!data.routes || !data.routes[0]) throw new Error("Itinéraire introuvable");
-      const distanceKm = data.routes[0].summary.distance / 1000;
-      const durationMin = data.routes[0].summary.duration / 60;
-      return { distanceKm: Math.round(distanceKm * 10) / 10, durationMinSimple: Math.round(durationMin * 10) / 10 };
-    } catch (e) {
-      console.warn("ORS échoue, vol d'oiseau", e);
-      // vol d'oiseau
+      if (!data.routes?.[0]) throw new Error("Itinéraire introuvable");
+      return {
+        distanceKm: Math.round(data.routes[0].summary.distance / 100) / 10,
+        durationMinSimple: Math.round(data.routes[0].summary.duration / 6) / 10
+      };
+    } catch {
       const R = 6371;
       const dLat = (toLat - fromLat) * Math.PI / 180;
       const dLon = (toLon - fromLon) * Math.PI / 180;
       const a = Math.sin(dLat/2) ** 2 + Math.cos(fromLat * Math.PI / 180) * Math.cos(toLat * Math.PI / 180) * Math.sin(dLon/2) ** 2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      const dist = R * c * 1.3; // facteur correctif
-      const time = (dist / 35) * 60; // 35 km/h moyen
-      return { distanceKm: Math.round(dist * 10) / 10, durationMinSimple: Math.round(time * 10) / 10, approximate: true };
+      const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.3;
+      const time = (dist / 35) * 60;
+      return {
+        distanceKm: Math.round(dist * 10) / 10,
+        durationMinSimple: Math.round(time * 10) / 10,
+        approximate: true
+      };
     } finally {
       clearTimeout(timeout);
     }
   }
 
-  // ----- CALCUL DU PRIX -----
   function computePrice(distanceKm, durationMinSimple, department, city) {
     const cfg = getConfig();
-    const lower = (city || "").trim().toLowerCase();
+    if (city && cfg.postalPrices[city]) {
+      return { price: cfg.postalPrices[city], zone: "Tarif direct", details: [`Tarif direct ${city} : ${cfg.postalPrices[city]} €`] };
+    }
+    if ((city || "").includes("93330") || (city || "").toLowerCase().includes("neuilly-sur-marne")) {
+      return { price: cfg.priceStudio, zone: "Studio", details: [`Studio : ${cfg.priceStudio} €`] };
+    }
     const durationAR = durationMinSimple * 2;
-
-    // Priorité 1 : tarif direct code postal (si défini dans l'admin)
-    if (city && cfg.postalPrices && cfg.postalPrices[city]) {
-      return {
-        price: cfg.postalPrices[city],
-        zone: "Tarif direct",
-        details: [`Tarif direct pour le code postal ${city} : ${cfg.postalPrices[city]} €`]
-      };
-    }
-
-    // Neuilly-sur-Marne
-    if (lower.includes("neuilly-sur-marne") || city === "93330") {
-      return {
-        price: cfg.priceStudio,
-        zone: "Studio (Neuilly-sur-Marne)",
-        details: [`Forfait spécial Studio : ${cfg.priceStudio} €`]
-      };
-    }
-
-    let zone, basePrice, includedKm, includedMin, extraKmPrice, extraMinPrice;
-    let parisSurcharge = 0;
-
+    let zone, basePrice, includedKm, includedMin, extraKmPrice, extraMinPrice, parisSurcharge = 0;
     if (distanceKm <= cfg.localMaxKm && durationAR <= cfg.localMaxMin) {
-      zone = "Locale";
-      basePrice = cfg.priceLocal;
-      includedKm = cfg.localMaxKm;
-      includedMin = cfg.localMaxMin;
-      extraKmPrice = cfg.localExtraKmPrice;
-      extraMinPrice = cfg.localExtraMinPrice;
+      zone = "Locale"; basePrice = cfg.priceLocal; includedKm = cfg.localMaxKm; includedMin = cfg.localMaxMin;
+      extraKmPrice = cfg.localExtraKmPrice; extraMinPrice = cfg.localExtraMinPrice;
     } else if (distanceKm <= cfg.metroMaxKm && durationAR <= cfg.metroMaxMin) {
-      zone = "Métropolitaine";
-      basePrice = cfg.priceMetro;
-      includedKm = cfg.metroMaxKm;
-      includedMin = cfg.metroMaxMin;
-      extraKmPrice = cfg.metroExtraKmPrice;
-      extraMinPrice = cfg.metroExtraMinPrice;
+      zone = "Métropolitaine"; basePrice = cfg.priceMetro; includedKm = cfg.metroMaxKm; includedMin = cfg.metroMaxMin;
+      extraKmPrice = cfg.metroExtraKmPrice; extraMinPrice = cfg.metroExtraMinPrice;
     } else {
-      zone = "Étendue";
-      basePrice = cfg.priceExtended;
-      includedKm = cfg.extendedMaxKm;
-      includedMin = cfg.extendedMaxMin;
-      extraKmPrice = cfg.extendedExtraKmPrice;
-      extraMinPrice = cfg.extendedExtraMinPrice;
+      zone = "Étendue"; basePrice = cfg.priceExtended; includedKm = cfg.extendedMaxKm; includedMin = cfg.extendedMaxMin;
+      extraKmPrice = cfg.extendedExtraKmPrice; extraMinPrice = cfg.extendedExtraMinPrice;
       if (department === "75") parisSurcharge = cfg.parisSupplement;
     }
-
     const excessKm = Math.max(0, distanceKm - includedKm);
     const excessMin = Math.max(0, durationAR - includedMin);
     const kmCost = Math.round(excessKm * extraKmPrice * 10) / 10;
     const minCost = Math.round(excessMin * extraMinPrice * 10) / 10;
     const total = Math.round(basePrice + kmCost + minCost + parisSurcharge);
-
-    const details = [];
-    details.push(`Zone ${zone} — ${basePrice} €`);
+    const details = [`Zone ${zone} — ${basePrice} €`];
     if (excessKm > 0) details.push(`+ ${excessKm.toFixed(1)} km × ${extraKmPrice} € = ${kmCost.toFixed(1)} €`);
     if (excessMin > 0) details.push(`+ ${excessMin.toFixed(1)} min (A/R) × ${extraMinPrice} € = ${minCost.toFixed(1)} €`);
-    if (parisSurcharge > 0) details.push(`Supplément Paris intra-muros : +${parisSurcharge} €`);
-
+    if (parisSurcharge > 0) details.push(`Supplément Paris : +${parisSurcharge} €`);
     return { price: total, zone, details };
   }
 
-  // ----- UI -----
   const btn = document.getElementById("btn");
   const resultDiv = document.getElementById("result");
-
   document.querySelectorAll(".number-ctrl button").forEach(b => {
     b.addEventListener("click", () => {
       const input = document.getElementById(b.dataset.target);
@@ -400,57 +332,38 @@
   btn.addEventListener("click", async () => {
     const address = document.getElementById("address").value.trim();
     if (!address) return showResult(`<p style="color:#c0392b;">⚠ Veuillez entrer une ville ou un code postal.</p>`, "err");
-    
     btn.textContent = "Calcul en cours…"; btn.disabled = true;
     try {
-      // Géocodage
       const clientGeo = await geocode(address);
       if (!clientGeo) throw new Error("Adresse introuvable");
-
-      // Routage
       const route = await routeORS(STUDIO_POSITION.lat, STUDIO_POSITION.lon, clientGeo.lat, clientGeo.lon);
-      const distanceKm = route.distanceKm;
-      const durationSimple = route.durationMinSimple;
-      const durationAR = durationSimple * 2;
-
-      // Calcul prix
-      const pricing = computePrice(distanceKm, durationSimple, clientGeo.department, clientGeo.postcode || clientGeo.city);
+      const pricing = computePrice(route.distanceKm, route.durationMinSimple, clientGeo.department, clientGeo.postcode || clientGeo.city);
       const cfg = getConfig();
       const babies = parseInt(document.getElementById("babies").value) || 0;
       const persons = parseInt(document.getElementById("persons").value) || 0;
       const ants = parseInt(document.getElementById("ants").value) || 0;
-
       const babyCost = babies * cfg.priceBaby;
       const persCost = persons * cfg.priceExtraPers;
       const antsCost = ants * cfg.priceAnts;
       const grandTotal = pricing.price + babyCost + persCost + antsCost;
-
       let detailsHtml = pricing.details.map(d => `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>${d}</span></div>`).join('');
       if (babyCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Supplément Bébé (${babies})</span><span>${babyCost} €</span></div>`;
       if (persCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Pers. sup. (${persons})</span><span>${persCost} €</span></div>`;
       if (antsCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Photos ANTS (${ants})</span><span>${antsCost} €</span></div>`;
-
-      // Indication si approximation
-      let approxNote = "";
-      if (route.approximate || clientGeo.approximate) {
-        approxNote = `<div class="result-meta" style="font-style:italic; margin-top:10px;">⚠ Trajet approximatif (calcul à vol d'oiseau)</div>`;
-      }
-
+      const approxNote = route.approximate || clientGeo.approximate ? '<div class="result-meta" style="font-style:italic;">⚠ Trajet approximatif</div>' : '';
       showResult(`
-        <p style="font-size:0.75rem;text-transform:uppercase;color:#888;">${clientGeo.city || address} – ${distanceKm} km, ${durationSimple} min (simple) / ${durationAR} min (A/R)</p>
+        <p style="font-size:0.75rem;text-transform:uppercase;color:#888;">${clientGeo.city || address} – ${route.distanceKm} km, ${route.durationMinSimple} min (simple) / ${route.durationMinSimple*2} min (A/R)</p>
         <p class="result-price" style="margin:10px 0;">€${grandTotal}</p>
         <div style="margin-top:20px;padding-top:15px;border-top:1px dashed #ebebeb;">${detailsHtml}</div>
         <div class="result-meta">Zone : ${pricing.zone}</div>
         ${approxNote}
       `, "ok");
-
     } catch (err) {
-      showResult(`<p style="color:#c0392b;">⚠ ${err.message || "Erreur réseau"}</p>`, "err");
+      showResult(`<p style="color:#c0392b;">⚠ ${err.message}</p>`, "err");
     } finally {
       btn.textContent = "Calculer mes frais"; btn.disabled = false;
     }
   });
 </script>
-
 </body>
 </html>
