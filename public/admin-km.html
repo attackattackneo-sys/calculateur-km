@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Tarifs simplifiés | GregPhotographe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a1a1a;
+      --orange: #ff6600;
+      --orange-light: rgba(255, 102, 0, 0.08);
+      --bg: #f4f4f5;
+      --card: #ffffff;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--primary);
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .admin-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--primary);
+    }
+
+    .header h1 span { color: var(--orange); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-suffix {
+      position: absolute;
+      right: 12px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      background: #fafafa;
+    }
+
+    input[type="number"] {
+      padding-right: 30px;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--orange);
+      background: #fff;
+      box-shadow: 0 0 0 3px var(--orange-light);
+    }
+
+    .btn-save {
+      background: var(--orange);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-save:hover {
+      background: #e55c00;
+      transform: translateY(-1px);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #10b981;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    #publicGrid table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    #publicGrid th {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 2px solid var(--orange);
+    }
+    #publicGrid td {
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      body { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-container">
+  <div class="header">
+    <h1>Administration <span>Tarifs</span></h1>
+    <button class="btn-save" id="saveBtn">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+      Enregistrer
+    </button>
+  </div>
+
+  <form id="settingsForm" class="grid">
+    
+    <!-- Zone Studio -->
+    <div class="card">
+      <div class="card-title">🏠 Studio (Neuilly-sur-Marne)</div>
+      <div class="form-group">
+        <label>Forfait unique</label>
+        <div class="input-wrapper">
+          <input type="number" id="priceStudio" value="59" />
+          <span class="input-suffix">€</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone Locale -->
+    <div class="card">
+      <div class="card-title">📍 Zone Locale</div>
+      <div class="form-group">
+        <label>Distance max. incluse (aller simple)</label>
+        <div class="input-wrapper">
+          <input type="number" id="localMaxKm" value="16" step="0.1" />
+          <span class="input-suffix">km</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Temps de trajet max. inclus (aller‑retour)</label>
+        <div class="input-wrapper">
+          <input type="number" id="localMaxMin" value="30" />
+          <span class="input-suffix">min</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Forfait</label>
+        <div class="input-wrapper">
+          <input type="number" id="priceLocal" value="79" />
+          <span class="input-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Prix par km supplémentaire</label>
+        <div class="input-wrapper">
+          <input type="number" id="localExtraKmPrice" value="2.5" step="0.1" />
+          <span class="input-suffix">€/km</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Prix par minute supplémentaire (A/R)</label>
+        <div class="input-wrapper">
+          <input type="number" id="localExtraMinPrice" value="1.5" step="0.1" />
+          <span class="input-suffix">€/min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone Métropolitaine -->
+    <div class="card">
+      <div class="card-title">🚗 Zone Métropolitaine</div>
+      <div class="form-group">
+        <label>Distance max. incluse (aller simple)</label>
+        <div class="input-wrapper">
+          <input type="number" id="metroMaxKm" value="35" step="0.1" />
+          <span class="input-suffix">km</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Temps de trajet max. inclus (aller‑retour)</label>
+        <div class="input-wrapper">
+          <input type="number" id="metroMaxMin" value="50" />
+          <span class="input-suffix">min</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Forfait</label>
+        <div class="input-wrapper">
+          <input type="number" id="priceMetro" value="129" />
+          <span class="input-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>€/km supplémentaire</label>
+        <div class="input-wrapper">
+          <input type="number" id="metroExtraKmPrice" value="2.0" step="0.1" />
+          <span class="input-suffix">€/km</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>€/min supplémentaire (A/R)</label>
+        <div class="input-wrapper">
+          <input type="number" id="metroExtraMinPrice" value="1.2" step="0.1" />
+          <span class="input-suffix">€/min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone Étendue -->
+    <div class="card">
+      <div class="card-title">🌍 Zone Étendue (Paris inclus)</div>
+      <div class="form-group">
+        <label>Distance max. incluse (aller simple)</label>
+        <div class="input-wrapper">
+          <input type="number" id="extendedMaxKm" value="50" step="0.1" />
+          <span class="input-suffix">km</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Temps de trajet max. inclus (aller‑retour)</label>
+        <div class="input-wrapper">
+          <input type="number" id="extendedMaxMin" value="75" />
+          <span class="input-suffix">min</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Forfait</label>
+        <div class="input-wrapper">
+          <input type="number" id="priceExtended" value="179" />
+          <span class="input-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Supplément Paris intra-muros (si dép. 75)</label>
+        <div class="input-wrapper">
+          <input type="number" id="parisSupplement" value="30" />
+          <span class="input-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>€/km supplémentaire</label>
+        <div class="input-wrapper">
+          <input type="number" id="extendedExtraKmPrice" value="1.5" step="0.1" />
+          <span class="input-suffix">€/km</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>€/min supplémentaire (A/R)</label>
+        <div class="input-wrapper">
+          <input type="number" id="extendedExtraMinPrice" value="1.0" step="0.1" />
+          <span class="input-suffix">€/min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Options & Suppléments -->
+    <div class="card">
+      <div class="card-title">👥 Options &amp; Suppléments</div>
+      <div class="form-group">
+        <label>Bébé (0-3 mois)</label>
+        <div class="input-wrapper">
+          <input type="number" id="priceBaby" value="15" />
+          <span class="input-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Personne supplémentaire</label>
+        <div class="input-wrapper">
+          <input type="number" id="priceExtraPers" value="15" />
+          <span class="input-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Photos ANTS</label>
+        <div class="input-wrapper">
+          <input type="number" id="priceAnts" value="5" />
+          <span class="input-suffix">€</span>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- ==================== GRILLE TARIFAIRE PUBLIQUE ==================== -->
+  <div class="card" id="publicGrid" style="margin-top: 2rem;">
+    <div class="card-title">📋 Grille tarifaire publique (copie pour le site)</div>
+
+    <h3 style="font-family:'Playfair Display',serif; margin: 1.5rem 0 1rem; color: var(--primary);">
+      🚗 Tarifs de déplacement
+    </h3>
+    <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
+      Départ du studio : 16 boulevard Carnot, 93330 Neuilly-sur-Marne (93)
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Zone</th>
+          <th>Distance incluse (aller simple)</th>
+          <th>Temps inclus (aller‑retour)</th>
+          <th>Forfait</th>
+          <th>Au-delà (km)</th>
+          <th>Au-delà (min)</th>
+        </tr>
+      </thead>
+      <tbody id="gridBody">
+        <!-- Rempli dynamiquement -->
+      </tbody>
+    </table>
+
+    <h3 style="font-family:'Playfair Display',serif; margin: 1.5rem 0 1rem; color: var(--primary);">
+      👥 Suppléments &amp; Options
+    </h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Prix unitaire</th>
+        </tr>
+      </thead>
+      <tbody id="supplementsBody">
+        <!-- Rempli dynamiquement -->
+      </tbody>
+    </table>
+
+    <p style="font-size:0.8rem; color: var(--muted); font-style: italic; background: var(--orange-light); padding: 10px 15px; border-radius: 8px;" id="exampleText">
+      <!-- Exemple dynamique -->
+    </p>
+  </div>
+  <!-- ==================== FIN GRILLE TARIFAIRE PUBLIQUE ==================== -->
+
+</div>
+
+<div class="toast" id="toast">✅ Paramètres mis à jour avec succès !</div>
+
+<script>
+  // Sauvegarde / chargement configuration admin
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedConfig = localStorage.getItem('gregPricingV2');
+    if (savedConfig) {
+      const config = JSON.parse(savedConfig);
+      for (const [key, value] of Object.entries(config)) {
+        const el = document.getElementById(key);
+        if (el) el.value = value;
+      }
+    }
+    updatePublicGrid();
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', () => {
+    const config = {
+      priceStudio: Number(document.getElementById('priceStudio').value),
+      localMaxKm: Number(document.getElementById('localMaxKm').value),
+      localMaxMin: Number(document.getElementById('localMaxMin').value),
+      priceLocal: Number(document.getElementById('priceLocal').value),
+      localExtraKmPrice: Number(document.getElementById('localExtraKmPrice').value),
+      localExtraMinPrice: Number(document.getElementById('localExtraMinPrice').value),
+      metroMaxKm: Number(document.getElementById('metroMaxKm').value),
+      metroMaxMin: Number(document.getElementById('metroMaxMin').value),
+      priceMetro: Number(document.getElementById('priceMetro').value),
+      metroExtraKmPrice: Number(document.getElementById('metroExtraKmPrice').value),
+      metroExtraMinPrice: Number(document.getElementById('metroExtraMinPrice').value),
+      extendedMaxKm: Number(document.getElementById('extendedMaxKm').value),
+      extendedMaxMin: Number(document.getElementById('extendedMaxMin').value),
+      priceExtended: Number(document.getElementById('priceExtended').value),
+      parisSupplement: Number(document.getElementById('parisSupplement').value),
+      extendedExtraKmPrice: Number(document.getElementById('extendedExtraKmPrice').value),
+      extendedExtraMinPrice: Number(document.getElementById('extendedExtraMinPrice').value),
+      priceBaby: Number(document.getElementById('priceBaby').value),
+      priceExtraPers: Number(document.getElementById('priceExtraPers').value),
+      priceAnts: Number(document.getElementById('priceAnts').value)
+    };
+
+    localStorage.setItem('gregPricingV2', JSON.stringify(config));
+    console.log('✅ Configuration sauvegardée', config);
+
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+
+    updatePublicGrid();
+  });
+
+  // Met à jour la grille publique
+  function updatePublicGrid() {
+    const saved = localStorage.getItem('gregPricingV2');
+    if (!saved) return;
+    const cfg = JSON.parse(saved);
+
+    const zones = [
+      {
+        name: '🏠 Studio (Neuilly‑sur‑Marne)',
+        km: '−',
+        min: '−',
+        price: cfg.priceStudio + ' €',
+        extraKm: '−',
+        extraMin: '−'
+      },
+      {
+        name: '📍 Zone Locale',
+        km: cfg.localMaxKm + ' km',
+        min: cfg.localMaxMin + ' min',
+        price: cfg.priceLocal + ' €',
+        extraKm: '+' + cfg.localExtraKmPrice + ' €/km',
+        extraMin: '+' + cfg.localExtraMinPrice + ' €/min'
+      },
+      {
+        name: '🚗 Zone Métropolitaine',
+        km: cfg.metroMaxKm + ' km',
+        min: cfg.metroMaxMin + ' min',
+        price: cfg.priceMetro + ' €',
+        extraKm: '+' + cfg.metroExtraKmPrice + ' €/km',
+        extraMin: '+' + cfg.metroExtraMinPrice + ' €/min'
+      },
+      {
+        name: '🌍 Zone Étendue (Paris inclus)',
+        km: cfg.extendedMaxKm + ' km',
+        min: cfg.extendedMaxMin + ' min',
+        price: cfg.priceExtended + ' €',
+        extraKm: '+' + cfg.extendedExtraKmPrice + ' €/km',
+        extraMin: '+' + cfg.extendedExtraMinPrice + ' €/min'
+      }
+    ];
+
+    const gridBody = document.getElementById('gridBody');
+    gridBody.innerHTML = zones.map(z => `
+      <tr>
+        <td style="font-weight: 600;">${z.name}</td>
+        <td>${z.km}</td>
+        <td>${z.min}</td>
+        <td style="color: var(--orange); font-weight: 700;">${z.price}</td>
+        <td>${z.extraKm}</td>
+        <td>${z.extraMin}</td>
+      </tr>
+    `).join('') + `
+      <tr>
+        <td style="font-weight: 600;">🗼 Supplément Paris intra‑muros</td>
+        <td colspan="5" style="color: var(--orange); font-weight: 700;">+${cfg.parisSupplement} €</td>
+      </tr>
+    `;
+
+    const supplementsBody = document.getElementById('supplementsBody');
+    supplementsBody.innerHTML = `
+      <tr>
+        <td>👶 Bébé (0‑3 mois)</td>
+        <td style="color: var(--orange); font-weight: 700;">+${cfg.priceBaby} €</td>
+      </tr>
+      <tr>
+        <td>👤 Personne supplémentaire</td>
+        <td style="color: var(--orange); font-weight: 700;">+${cfg.priceExtraPers} €</td>
+      </tr>
+      <tr>
+        <td>📸 Photos ANTS</td>
+        <td style="color: var(--orange); font-weight: 700;">+${cfg.priceAnts} €</td>
+      </tr>
+    `;
+
+    // Exemple dynamique (Paris 11e, 22 km, durée simple estimée 45 min → A/R 90 min)
+    const distEx = 22;
+    const durSimpleEx = 45; // estimation
+    const durAREx = durSimpleEx * 2;
+    const depEx = "75";
+    const baseEx = cfg.priceExtended;
+    const supplementParisEx = cfg.parisSupplement;
+    const excessMinEx = Math.max(0, durAREx - cfg.extendedMaxMin);
+    const excessKmEx = Math.max(0, distEx - cfg.extendedMaxKm);
+    const kmCostEx = Math.round(excessKmEx * cfg.extendedExtraKmPrice);
+    const minCostEx = Math.round(excessMinEx * cfg.extendedExtraMinPrice);
+    const totalEx = baseEx + supplementParisEx + kmCostEx + minCostEx;
+
+    const exampleEl = document.getElementById('exampleText');
+    exampleEl.innerHTML = `
+      <strong>💡 Exemple :</strong> Pour une prestation à <strong>Paris 11<sup>e</sup></strong> (${distEx} km, ~${durSimpleEx} min de trajet simple 
+      soit <strong>${durAREx} min aller‑retour</strong>), le déplacement est facturé <strong>${totalEx} €</strong> 
+      (Zone Étendue : ${baseEx} € + supplément Paris ${supplementParisEx} € + ${excessMinEx} min × ${cfg.extendedExtraMinPrice} € 
+      ${excessKmEx > 0 ? '+ ' + excessKmEx + ' km × ' + cfg.extendedExtraKmPrice + ' €' : ''}).
+    `;
+  }
+</script>
+
+</body>
+</html>
