@@ -104,6 +104,11 @@
     .result-meta { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-top: 8px; }
     
     .card-note { padding: 1rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: #bbb; text-align: center; }
+    
+    .sync-note {
+      font-size: 0.7rem; color: #10b981; text-align: center; margin-top: 0.5rem;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -116,7 +121,7 @@
 
   <div class="card-body">
     <div class="field">
-      <label for="address">Lieu de la prestation - Code Postal uniquement</label>
+      <label for="address">Lieu de la prestation</label>
       <input id="address" type="text" placeholder="Ville ou code postal…" />
     </div>
 
@@ -149,6 +154,7 @@
     </div>
 
     <button id="btn" class="btn-calc">Calculer mes frais</button>
+    <p class="sync-note" id="syncNote">✅ Tarifs mis à jour (grille admin modifiée)</p>
   </div>
 
   <div id="result"></div>
@@ -163,6 +169,7 @@
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }
+    // valeurs par défaut
     return {
       priceStudio: 59,
       localMaxKm: 16, localMaxMin: 30, priceLocal: 79,
@@ -182,14 +189,34 @@
     document.getElementById('persUnitPrice').textContent = cfg.priceExtraPers;
     document.getElementById('antsUnitPrice').textContent = cfg.priceAnts;
   }
+
   window.addEventListener('load', updateUIPrices);
+
+  // Écoute des modifications du localStorage dans les autres onglets
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'gregPricingV2') {
+      updateUIPrices();
+      // Affiche une brève notification
+      const note = document.getElementById('syncNote');
+      note.style.display = 'block';
+      setTimeout(() => { note.style.display = 'none'; }, 3000);
+      // Si un résultat est déjà affiché, on propose un recalcul automatique (ou on efface)
+      const resultDiv = document.getElementById('result');
+      if (resultDiv.classList.contains('visible')) {
+        // On peut soit effacer, soit relancer le calcul automatiquement
+        // Ici, on efface simplement pour éviter un résultat obsolète
+        resultDiv.innerHTML = '';
+        resultDiv.className = '';
+        document.getElementById('btn').textContent = 'Calculer mes frais (tarifs mis à jour)';
+      }
+    }
+  });
 
   function round1(n) { return Math.round(n * 10) / 10; }
 
   function computePrice(city, department, distanceKm, durationMinSimple) {
     const cfg = getPricingConfig();
     const lower = (city || "").trim().toLowerCase();
-    // durée aller-retour = 2 × durée simple
     const durationAR = durationMinSimple * 2;
 
     if (lower.includes("neuilly-sur-marne")) {
@@ -203,7 +230,6 @@
     let zone, basePrice, includedKm, includedMin, extraKmPrice, extraMinPrice;
     let parisSurcharge = 0;
 
-    // Priorité : locale, puis métro, sinon étendue
     if (distanceKm <= cfg.localMaxKm && durationAR <= cfg.localMaxMin) {
       zone = "Locale";
       basePrice = cfg.priceLocal;
@@ -270,7 +296,7 @@
     const j = await r.json();
     if (j.code !== "Ok" || !j.routes?.[0]) throw new Error("Itinéraire indisponible.");
     const distanceKm = j.routes[0].distance / 1000;
-    const durationMinSimple = j.routes[0].duration / 60; // temps simple
+    const durationMinSimple = j.routes[0].duration / 60;
     return { distanceKm: round1(distanceKm), durationMinSimple: round1(durationMinSimple) };
   }
 
