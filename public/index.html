@@ -156,9 +156,12 @@
 </div>
 
 <script>
-  const STUDIO_ADDRESS = "16 boulevard Carnot, 93330 Neuilly-sur-Marne, France";
-  const ORS_API_KEY = "5b3ce3597851110001cf6248"; // Clé gratuite OpenRouteService
+  // ----- STUDIO (coordonnées hardcodées) -----
+  const STUDIO_POSITION = { lat: 48.8582, lon: 2.5286 };  // 16 bd Carnot, Neuilly-sur-Marne
 
+  const ORS_API_KEY = "5b3ce3597851110001cf6248";
+
+  // ----- Tarifs (lus depuis localStorage, avec fallback) -----
   function getPricingConfig() {
     const saved = localStorage.getItem('gregPricingV2');
     if (saved) {
@@ -190,6 +193,7 @@
 
   function round1(n) { return Math.round(n * 10) / 10; }
 
+  // ----- Logique de tarification -----
   function computePrice(city, department, distanceKm, durationMinSimple) {
     const cfg = getPricingConfig();
     const lower = (city || "").trim().toLowerCase();
@@ -245,9 +249,30 @@
     return { price: total, zone, details };
   }
 
-  // Géocodage avec fallback code postal
+  // ----- TABLE DE CORRESPONDANCE CODE POSTAL -> distance / temps MOYEN (aller simple) -----
+  // Valeurs mesurées depuis le studio (16 bd Carnot, 93330)
+  const FALLBACK_ESTIMATES = {
+    // Ville -> { km, min }
+    "93160": { km: 3.2, min: 10 },  // Noisy-le-Grand
+    "93330": { km: 0.0, min: 0 },   // Neuilly-sur-Marne
+    "93170": { km: 6.5, min: 18 },  // Bagnolet
+    "93100": { km: 8.0, min: 22 },  // Montreuil
+    "93200": { km: 12.0, min: 30 }, // Saint-Denis
+    "75001": { km: 16.0, min: 40 }, // Paris centre
+    "75011": { km: 14.5, min: 38 },
+    "75015": { km: 18.0, min: 45 },
+    "75020": { km: 13.0, min: 35 },
+    "77500": { km: 22.0, min: 35 }, // Chelles
+    "77000": { km: 30.0, min: 45 }, // Melun
+    "91000": { km: 25.0, min: 40 }, // Évry
+    "92000": { km: 20.0, min: 35 }, // Nanterre
+    "94000": { km: 10.0, min: 25 }, // Créteil
+    // Ajoutez d'autres codes postaux si nécessaire
+  };
+
+  // ----- Géocodage : essayer Nominatim, sinon fallback code postal avec distances préenregistrées -----
   async function geocode(address) {
-    // Essayer Nominatim
+    // 1. Essai Nominatim
     try {
       const url = new URL("https://nominatim.openstreetmap.org/search");
       url.searchParams.set("q", address.includes("France") ? address : `${address}, France`);
@@ -258,53 +283,68 @@
       const r = await fetch(url.toString(), {
         headers: { "User-Agent": "GregPhotographe-km-calculator/1.0" }
       });
-      if (!r.ok) throw new Error("Erreur réseau Nominatim");
-      const data = await r.json();
-      if (!Array.isArray(data) || !data[0]) throw new Error("Adresse introuvable");
-      const a = data[0].address || {};
-      return {
-        lat: Number(data[0].lat),
-        lon: Number(data[0].lon),
-        city: a.city || a.town || a.village || "",
-        department: (a.postcode || "").slice(0, 2)
-      };
-    } catch (e) {
-      console.warn("Nominatim échoue, fallback code postal", e);
-      // Fallback : on extrait un code postal de l'adresse et on place un point central départemental
-      const postcodeMatch = address.match(/\b(\d{5})\b/);
-      if (postcodeMatch) {
-        const dept = postcodeMatch[1].slice(0, 2);
-        // Coordonnées approximatives des préfectures (lat, lon)
-        const deptCenter = {
-          "75": { lat: 48.8566, lon: 2.3522 },
-          "77": { lat: 48.5399, lon: 2.6595 },
-          "78": { lat: 48.8014, lon: 2.1303 },
-          "91": { lat: 48.5839, lon: 2.3081 },
-          "92": { lat: 48.8924, lon: 2.2153 },
-          "93": { lat: 48.9316, lon: 2.3976 },
-          "94": { lat: 48.7846, lon: 2.4238 },
-          "95": { lat: 49.0375, lon: 2.0749 }
-        };
-        if (deptCenter[dept]) {
+      if (r.ok) {
+        const data = await r.json();
+        if (Array.isArray(data) && data[0]) {
+          const a = data[0].address || {};
           return {
-            lat: deptCenter[dept].lat,
-            lon: deptCenter[dept].lon,
-            city: address,
-            department: dept
+            lat: Number(data[0].lat),
+            lon: Number(data[0].lon),
+            city: a.city || a.town || a.village || "",
+            department: (a.postcode || "").slice(0, 2),
+            postcode: a.postcode || ""
           };
         }
       }
-      throw new Error("Impossible de localiser cette adresse. Veuillez réessayer ou saisir un code postal.");
+    } catch (e) {
+      console.warn("Nominatim indisponible, fallback manuel", e);
     }
+
+    // 2. Fallback : extraire le code postal
+    const postcodeMatch = address.match(/\b(\d{5})\b/);
+    if (postcodeMatch) {
+      const postcode = postcodeMatch[1];
+      const dept = postcode.slice(0, 2);
+      // Si on a une entrée dans la table, on renvoie une position fictive mais avec les infos nécessaires
+      if (FALLBACK_ESTIMATES[postcode]) {
+        return {
+          lat: 0, lon: 0, // pas utilisé pour routage si on utilise le fallback ci‑dessous
+          city: postcode,
+          department: dept,
+          postcode: postcode,
+          useFallbackEstimate: true,
+          estimate: FALLBACK_ESTIMATES[postcode]
+        };
+      }
+      // Sinon, on utilise le centre du département (moins précis)
+      const deptCenter = {
+        "75": { lat: 48.8566, lon: 2.3522 },
+        "77": { lat: 48.5399, lon: 2.6595 },
+        "78": { lat: 48.8014, lon: 2.1303 },
+        "91": { lat: 48.5839, lon: 2.3081 },
+        "92": { lat: 48.8924, lon: 2.2153 },
+        "93": { lat: 48.9316, lon: 2.3976 },
+        "94": { lat: 48.7846, lon: 2.4238 },
+        "95": { lat: 49.0375, lon: 2.0749 }
+      };
+      if (deptCenter[dept]) {
+        return {
+          lat: deptCenter[dept].lat,
+          lon: deptCenter[dept].lon,
+          city: postcode,
+          department: dept,
+          postcode: postcode,
+          useFallbackEstimate: false
+        };
+      }
+    }
+    throw new Error("Adresse introuvable. Veuillez saisir un code postal valide.");
   }
 
-  // Routage avec OpenRouteService (plus fiable)
+  // ----- Routage : OpenRouteService ou vol d'oiseau -----
   async function routeORS(fromLat, fromLon, toLat, toLon) {
-    const body = {
-      coordinates: [[fromLon, fromLat], [toLon, toLat]],
-      format: "json"
-    };
-    const url = `https://api.openrouteservice.org/v2/directions/driving-car`;
+    const body = { coordinates: [[fromLon, fromLat], [toLon, toLat]], format: "json" };
+    const url = "https://api.openrouteservice.org/v2/directions/driving-car";
     const r = await fetch(url, {
       method: "POST",
       headers: {
@@ -313,40 +353,55 @@
       },
       body: JSON.stringify(body)
     });
-    if (!r.ok) throw new Error("Service de routage indisponible (ORS)");
+    if (!r.ok) throw new Error("Service de routage indisponible");
     const data = await r.json();
     if (!data.routes || !data.routes[0]) throw new Error("Itinéraire introuvable");
-    const distanceKm = data.routes[0].summary.distance / 1000;
-    const durationMinSimple = data.routes[0].summary.duration / 60;
-    return { distanceKm: round1(distanceKm), durationMinSimple: round1(durationMinSimple) };
+    return {
+      distanceKm: round1(data.routes[0].summary.distance / 1000),
+      durationMinSimple: round1(data.routes[0].summary.duration / 60)
+    };
   }
 
-  // Fallback distance à vol d'oiseau + estimation temps si ORS échoue
-  function computeCrowFliesDistance(lat1, lon1, lat2, lon2) {
+  function crowFliesDistance(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const a = Math.sin(dLat/2) ** 2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
   }
 
-  async function getRouteWrapper(fromLat, fromLon, toLat, toLon) {
+  // Wrapper qui gère plusieurs fallbacks
+  async function getRouteInfo(clientGeo) {
+    // Si le géocodage a déjà fourni une estimation directe (table postcode)
+    if (clientGeo.useFallbackEstimate && clientGeo.estimate) {
+      return {
+        distanceKm: clientGeo.estimate.km,
+        durationMinSimple: clientGeo.estimate.min,
+        source: 'estimation forfaitaire'
+      };
+    }
+
+    // Sinon, on essaie ORS avec les coordonnées
     try {
-      return await routeORS(fromLat, fromLon, toLat, toLon);
+      return await routeORS(STUDIO_POSITION.lat, STUDIO_POSITION.lon, clientGeo.lat, clientGeo.lon);
     } catch (e) {
-      console.warn("ORS échoue, fallback à vol d'oiseau", e);
-      const dist = computeCrowFliesDistance(fromLat, fromLon, toLat, toLon);
-      // Estimation grossière du temps : moyenne 40 km/h en ville
-      const durationSimple = (dist / 40) * 60;
-      return { distanceKm: round1(dist * 1.3), durationMinSimple: round1(durationSimple * 1.5) }; // facteur pour route réelle
+      console.warn("ORS échoue, calcul à vol d'oiseau", e);
+      const distCrow = crowFliesDistance(STUDIO_POSITION.lat, STUDIO_POSITION.lon, clientGeo.lat, clientGeo.lon);
+      // facteur correctif pour route réelle
+      const estimatedDist = distCrow * 1.3;
+      const estimatedTime = (estimatedDist / 35) * 60; // 35 km/h moyen
+      return {
+        distanceKm: round1(estimatedDist),
+        durationMinSimple: round1(estimatedTime),
+        source: 'estimation à vol d\'oiseau'
+      };
     }
   }
 
+  // ----- Interface utilisateur -----
   const btn = document.getElementById("btn");
-  const result = document.getElementById("result");
+  const resultDiv = document.getElementById("result");
 
   document.querySelectorAll(".number-ctrl button").forEach(b => {
     b.addEventListener("click", () => {
@@ -357,8 +412,8 @@
   });
 
   function showResult(html, type) {
-    result.innerHTML = `<div class="result-inner ${type}">${html}</div>`;
-    result.className = "visible";
+    resultDiv.innerHTML = `<div class="result-inner ${type}">${html}</div>`;
+    resultDiv.className = "visible";
   }
 
   btn.addEventListener("click", async () => {
@@ -368,14 +423,26 @@
     btn.textContent = "Recherche en cours..."; btn.disabled = true;
     
     try {
-      const studioGeo = await geocode(STUDIO_ADDRESS);
+      // Géocodage client (avec fallbacks)
       const clientGeo = await geocode(addr);
-      const route = await getRouteWrapper(studioGeo.lat, studioGeo.lon, clientGeo.lat, clientGeo.lon);
-      const city = clientGeo.city || addr;
-      const dept = clientGeo.department;
-      const durationAR = route.durationMinSimple * 2;
+      if (!clientGeo) throw new Error("Adresse introuvable.");
 
-      const pricing = computePrice(city, dept, route.distanceKm, route.durationMinSimple);
+      // Calcul distance & temps (utilise la table si nécessaire)
+      const route = await getRouteInfo(clientGeo);
+      const distanceKm = route.distanceKm;
+      const durationSimple = route.durationMinSimple;
+      const durationAR = durationSimple * 2;
+
+      // Vérification anti‑zéro
+      if (distanceKm === 0 && !clientGeo.useFallbackEstimate) {
+        // Si zéro et pas de table, message d'erreur
+        throw new Error("Impossible de calculer la distance pour cette adresse. Essayez un code postal voisin.");
+      }
+
+      const city = clientGeo.city || addr;
+      const department = clientGeo.department;
+      const pricing = computePrice(city, department, distanceKm, durationSimple);
+
       const cfg = getPricingConfig();
       const babies = parseInt(document.getElementById("babies").value) || 0;
       const persons = parseInt(document.getElementById("persons").value) || 0;
@@ -391,11 +458,19 @@
       if (persCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Pers. sup. (${persons})</span><span>${persCost} €</span></div>`;
       if (antsCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Photos ANTS (${ants})</span><span>${antsCost} €</span></div>`;
 
+      let sourceNote = "";
+      if (route.source === 'estimation forfaitaire') {
+        sourceNote = `<div class="result-meta" style="font-style:italic;">⚠ Estimation basée sur une distance moyenne pour ce code postal.</div>`;
+      } else if (route.source && route.source.includes('vol d\'oiseau')) {
+        sourceNote = `<div class="result-meta" style="font-style:italic;">⚠ Distance approximative (calcul à vol d'oiseau).</div>`;
+      }
+
       showResult(`
-        <p style="font-size:0.75rem;text-transform:uppercase;color:#888;">${city} – ${route.distanceKm} km, ${route.durationMinSimple} min (simple) / ${durationAR} min (A/R)</p>
+        <p style="font-size:0.75rem;text-transform:uppercase;color:#888;">${city} – ${distanceKm} km, ${durationSimple} min (simple) / ${durationAR} min (A/R)</p>
         <p class="result-price" style="margin:10px 0;">€${grandTotal}</p>
         <div style="margin-top:20px;padding-top:15px;border-top:1px dashed #ebebeb;">${detailsHtml}</div>
         <div class="result-meta">Zone : ${pricing.zone}</div>
+        ${sourceNote}
       `, "ok");
 
     } catch (err) {
