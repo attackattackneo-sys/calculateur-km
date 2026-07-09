@@ -11,10 +11,10 @@ function getPricingConfig() {
     localMaxKm: 16, localMaxMin: 30, priceLocal: 79,
     localExtraKmPrice: 2.5, localExtraMinPrice: 1.5,
     metroMaxKm: 35, metroMaxMin: 50, priceMetro: 129,
-    metroExtraKmPrice: 2.0, metroExtraMinPrice: 1.2,
+    metroExtraKmPrice: 2, metroExtraMinPrice: 1.2,
     extendedMaxKm: 50, extendedMaxMin: 75, priceExtended: 179,
     parisSupplement: 30,
-    extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1.0,
+    extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1,
     priceBaby: 15, priceExtraPers: 15, priceAnts: 5
   };
 }

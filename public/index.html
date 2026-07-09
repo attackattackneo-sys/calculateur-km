@@ -133,38 +133,54 @@
     <button id="btn" class="btn-calc">Calculer mes frais</button>
   </div>
   <div id="result"></div>
-  <p class="card-note">Itinéraire calculé depuis le studio à Neuilly-sur-Marne</p>
+  <p class="card-note">
+    Itinéraire calculé depuis le studio à Neuilly-sur-Marne (93330).
+    <br><strong>Zones :</strong> Locale ≤16km/30min A/R, Métropolitaine ≤35km/50min A/R, Étendue au-delà.
+    <br>Les prix incluent les frais de déplacement aller-retour.
+  </p>
 </div>
 
 <script>
- // ⚠️ Ne pas modifier ce bloc manuellement. Copiez-le depuis l'admin.
+ // Charge la configuration depuis localStorage (modifiable via admin)
 function getConfig() {
-  return {
-  "priceStudio": 59,
-  "localMaxKm": 5,
-  "localMaxMin": 10,
-  "priceLocal": 79,
-  "localExtraKmPrice": 2,
-  "localExtraMinPrice": 1,
-  "metroMaxKm": 10,
-  "metroMaxMin": 15,
-  "priceMetro": 85,
-  "metroExtraKmPrice": 2,
-  "metroExtraMinPrice": 1,
-  "extendedMaxKm": 13,
-  "extendedMaxMin": 30,
-  "priceExtended": 110,
-  "parisSupplement": 35,
-  "extendedExtraKmPrice": 1.5,
-  "extendedExtraMinPrice": 0.5,
-  "priceBaby": 15,
-  "priceExtraPers": 15,
-  "priceAnts": 5,
-  "postalPrices": {
-    "77500": 95,
-    "93160": 95
+  const STORAGE_KEY = 'gregPricingV2';
+  const defaultConfig = {
+    "priceStudio": 59,
+    "localMaxKm": 16,
+    "localMaxMin": 30,
+    "priceLocal": 79,
+    "localExtraKmPrice": 2.5,
+    "localExtraMinPrice": 1.5,
+    "metroMaxKm": 35,
+    "metroMaxMin": 50,
+    "priceMetro": 129,
+    "metroExtraKmPrice": 2,
+    "metroExtraMinPrice": 1.2,
+    "extendedMaxKm": 50,
+    "extendedMaxMin": 75,
+    "priceExtended": 179,
+    "parisSupplement": 30,
+    "extendedExtraKmPrice": 1.5,
+    "extendedExtraMinPrice": 1,
+    "priceBaby": 15,
+    "priceExtraPers": 15,
+    "priceAnts": 5,
+    "postalPrices": {
+      "77500": 95,
+      "93160": 95
+    }
+  };
+  
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      // Fusion avec les valeurs par défaut pour les champs manquants
+      return { ...defaultConfig, ...parsed };
+    } catch (e) {}
   }
-};
+  
+  return defaultConfig;
 }
 
   const STUDIO_POSITION = { lat: 48.8582, lon: 2.5286 };
@@ -324,7 +340,9 @@ function getConfig() {
 
     const details = [`Zone ${zone} — ${basePrice} €`];
     if (excessKm > 0) details.push(`+ ${excessKm.toFixed(1)} km × ${extraKmPrice} € = ${kmCost.toFixed(1)} €`);
+    else if (zone !== 'Studio') details.push(`Distance dans la limite (≤${includedKm} km)`);
     if (excessMin > 0) details.push(`+ ${excessMin.toFixed(1)} min (A/R) × ${extraMinPrice} € = ${minCost.toFixed(1)} €`);
+    else if (zone !== 'Studio') details.push(`Temps dans la limite (≤${includedMin} min A/R)`);
     if (parisSurcharge > 0) details.push(`Supplément Paris : +${parisSurcharge} €`);
 
     return { price: total, zone, details };
@@ -364,15 +382,33 @@ function getConfig() {
       const antsCost = ants * cfg.priceAnts;
       const grandTotal = pricing.price + babyCost + persCost + antsCost;
       let detailsHtml = pricing.details.map(d => `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>${d}</span></div>`).join('');
-      if (babyCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Supplément Bébé (${babies})</span><span>${babyCost} €</span></div>`;
-      if (persCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Pers. sup. (${persons})</span><span>${persCost} €</span></div>`;
-      if (antsCost) detailsHtml += `<div style="display:flex;justify-content:space-between;"><span>Photos ANTS (${ants})</span><span>${antsCost} €</span></div>`;
+      
+      // Ajouter une séparation pour les suppléments optionnels
+      if (babyCost || persCost || antsCost) {
+        detailsHtml += `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed #ebebeb; font-size:0.85rem; color:var(--muted);">Suppléments optionnels :</div>`;
+      }
+      if (babyCost) detailsHtml += `<div style="display:flex;justify-content:space-between;margin-top:6px;"><span>Bébé 0-3 mois (${babies})</span><span>+${babyCost} €</span></div>`;
+      if (persCost) detailsHtml += `<div style="display:flex;justify-content:space-between;margin-top:6px;"><span>Personne supplémentaire (${persons})</span><span>+${persCost} €</span></div>`;
+      if (antsCost) detailsHtml += `<div style="display:flex;justify-content:space-between;margin-top:6px;"><span>Photos ANTS (${ants})</span><span>+${antsCost} €</span></div>`;
+      const durationAR = route.durationMinSimple * 2;
       const approxNote = route.approximate || clientGeo.approximate ? '<div class="result-meta" style="font-style:italic;">⚠ Trajet approximatif</div>' : '';
+      
+      // Ajout des seuils de la zone pour transparence
+      let zoneThresholds = '';
+      if (pricing.zone === 'Locale') {
+        zoneThresholds = `<div class="result-meta">Seuils Locale : ≤${cfg.localMaxKm} km / ≤${cfg.localMaxMin} min A/R</div>`;
+      } else if (pricing.zone === 'Métropolitaine') {
+        zoneThresholds = `<div class="result-meta">Seuils Métropolitaine : ≤${cfg.metroMaxKm} km / ≤${cfg.metroMaxMin} min A/R</div>`;
+      } else if (pricing.zone === 'Étendue') {
+        zoneThresholds = `<div class="result-meta">Seuils Étendue : >${cfg.extendedMaxKm} km ou >${cfg.extendedMaxMin} min A/R</div>`;
+      }
+      
       showResult(`
-        <p style="font-size:0.75rem;text-transform:uppercase;color:#888;">${clientGeo.city || address} – ${route.distanceKm} km, ${route.durationMinSimple} min (simple) / ${route.durationMinSimple*2} min (A/R)</p>
+        <p style="font-size:0.75rem;text-transform:uppercase;color:#888;">${clientGeo.city || address} – ${route.distanceKm} km, ${route.durationMinSimple} min (simple) / ${durationAR} min (A/R)</p>
         <p class="result-price" style="margin:10px 0;">€${grandTotal}</p>
         <div style="margin-top:20px;padding-top:15px;border-top:1px dashed #ebebeb;">${detailsHtml}</div>
         <div class="result-meta">Zone : ${pricing.zone}</div>
+        ${zoneThresholds}
         ${approxNote}
       `, "ok");
     } catch (err) {

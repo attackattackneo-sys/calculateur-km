@@ -148,11 +148,17 @@
 
 <div class="admin-container">
   <div class="header">
-    <h1>Administration <span>Tarifs</span></h1>
+    <div>
+      <h1>Administration <span>Tarifs</span></h1>
+      <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem;">
+        ⚡ Modifiez les prix et cliquez sur <strong>"Enregistrer & Appliquer"</strong> - les changements s'appliquent automatiquement.
+      </p>
+    </div>
     <div class="btn-group">
       <button class="btn-import" id="importBtn">📥 Importer JSON</button>
       <button class="btn-export" id="exportBtn">📤 Exporter JSON</button>
-      <button class="btn-save" id="saveAllBtn">💾 Enregistrer</button>
+      <button class="btn-save" id="saveAllBtn">💾 Enregistrer & Appliquer</button>
+      <button class="btn-open" id="openClientBtn" style="background: #10b981;">🔗 Voir la page client</button>
     </div>
   </div>
 
@@ -166,27 +172,27 @@
       </div>
       <div>
         <h4>📍 Zone Locale</h4>
-        <label>Distance max (km)</label><input type="number" id="localMaxKm" value="6" step="0.1" />
-        <label>Temps max (min A/R)</label><input type="number" id="localMaxMin" value="20" />
+        <label>Distance max (km)</label><input type="number" id="localMaxKm" value="16" step="0.1" />
+        <label>Temps max (min A/R)</label><input type="number" id="localMaxMin" value="30" />
         <label>Forfait (€)</label><input type="number" id="priceLocal" value="79" />
         <label>€/km sup.</label><input type="number" id="localExtraKmPrice" value="2.5" step="0.1" />
         <label>€/min sup.</label><input type="number" id="localExtraMinPrice" value="1.5" step="0.1" />
       </div>
       <div>
         <h4>🚗 Zone Métropolitaine</h4>
-        <label>Distance max (km)</label><input type="number" id="metroMaxKm" value="10" step="0.1" />
-        <label>Temps max (min A/R)</label><input type="number" id="metroMaxMin" value="35" />
+        <label>Distance max (km)</label><input type="number" id="metroMaxKm" value="35" step="0.1" />
+        <label>Temps max (min A/R)</label><input type="number" id="metroMaxMin" value="50" />
         <label>Forfait (€)</label><input type="number" id="priceMetro" value="129" />
-        <label>€/km sup.</label><input type="number" id="metroExtraKmPrice" value="2.5" step="0.1" />
-        <label>€/min sup.</label><input type="number" id="metroExtraMinPrice" value="1.5" step="0.1" />
+        <label>€/km sup.</label><input type="number" id="metroExtraKmPrice" value="2" step="0.1" />
+        <label>€/min sup.</label><input type="number" id="metroExtraMinPrice" value="1.2" step="0.1" />
       </div>
       <div>
         <h4>🌍 Zone Étendue</h4>
-        <label>Distance max (km)</label><input type="number" id="extendedMaxKm" value="12" step="0.1" />
-        <label>Temps max (min A/R)</label><input type="number" id="extendedMaxMin" value="45" />
+        <label>Distance max (km)</label><input type="number" id="extendedMaxKm" value="50" step="0.1" />
+        <label>Temps max (min A/R)</label><input type="number" id="extendedMaxMin" value="75" />
         <label>Forfait (€)</label><input type="number" id="priceExtended" value="179" />
-        <label>Supplément Paris (€)</label><input type="number" id="parisSupplement" value="35" />
-        <label>€/km sup.</label><input type="number" id="extendedExtraKmPrice" value="1" step="0.1" />
+        <label>Supplément Paris (€)</label><input type="number" id="parisSupplement" value="30" />
+        <label>€/km sup.</label><input type="number" id="extendedExtraKmPrice" value="1.5" step="0.1" />
         <label>€/min sup.</label><input type="number" id="extendedExtraMinPrice" value="1" step="0.1" />
       </div>
     </div>
@@ -212,8 +218,8 @@
     <button id="addRowBtn" style="margin-top:0.8rem; background: var(--orange); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">+ Ajouter</button>
   </div>
 
-  <!-- Bloc de configuration JS -->
-  <div class="card">
+  <!-- Bloc de configuration JS (masqué - les modifications sont appliquées automatiquement via localStorage) -->
+  <div class="card" style="display: none;">
     <div class="card-title">📋 Code <code>getConfig()</code> à copier dans votre site</div>
     <p style="font-size:0.85rem; color: var(--muted); margin-bottom: 1rem;">
       Copiez ce bloc et remplacez la fonction <code>getConfig()</code> dans votre page <code>index.html</code>.
@@ -241,15 +247,15 @@
 
   const defaultConfig = {
     priceStudio: 59,
-    localMaxKm: 6, localMaxMin: 20, priceLocal: 79,
+    localMaxKm: 16, localMaxMin: 30, priceLocal: 79,
     localExtraKmPrice: 2.5, localExtraMinPrice: 1.5,
-    metroMaxKm: 10, metroMaxMin: 35, priceMetro: 129,
-    metroExtraKmPrice: 2.5, metroExtraMinPrice: 1.5,
-    extendedMaxKm: 12, extendedMaxMin: 45, priceExtended: 179,
-    parisSupplement: 35,
-    extendedExtraKmPrice: 1, extendedExtraMinPrice: 1,
+    metroMaxKm: 35, metroMaxMin: 50, priceMetro: 129,
+    metroExtraKmPrice: 2, metroExtraMinPrice: 1.2,
+    extendedMaxKm: 50, extendedMaxMin: 75, priceExtended: 179,
+    parisSupplement: 30,
+    extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1,
     priceBaby: 15, priceExtraPers: 15, priceAnts: 5,
-    postalPrices: {"77500": 95}
+    postalPrices: {"77500": 95, "93160": 95}
   };
 
   let currentConfig = JSON.parse(JSON.stringify(defaultConfig));
@@ -335,7 +341,7 @@
     readFieldsToConfig();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(currentConfig));
     refreshAllOutputs();
-    showToast();
+    showToast('✅ Tarifs enregistrés et appliqués !');
   }
 
   function renderPostalTable() {
@@ -398,7 +404,7 @@
   // --- Génération du texte brut pour Google Sites ---
   function generatePlainTextSummary() {
     const cfg = currentConfig;
-    // Exemple Paris 11e : on garde une distance de 22 km et 45 min simple (90 min A/R)
+    // Exemple Paris 11e : distance d'environ 22 km et 45 min simple (90 min A/R)
     const dist = 22;
     const timeSimple = 45;
     const timeAR = timeSimple * 2;
@@ -409,16 +415,21 @@
     const minCost = excessMin * cfg.extendedExtraMinPrice;
     const totalExample = Math.round(base + cfg.parisSupplement + kmCost + minCost);
 
-    let text = `📍 Zone Locale (${cfg.localMaxKm} km / ${cfg.localMaxMin} min A/R) : ${cfg.priceLocal} € (+${cfg.localExtraKmPrice} €/km, +${cfg.localExtraMinPrice} €/min)\n`;
-    text += `🚗 Zone Métropolitaine (${cfg.metroMaxKm} km / ${cfg.metroMaxMin} min A/R) : ${cfg.priceMetro} € (+${cfg.metroExtraKmPrice} €/km, +${cfg.metroExtraMinPrice} €/min)\n`;
-    text += `🌍 Zone Étendue (${cfg.extendedMaxKm} km / ${cfg.extendedMaxMin} min A/R) : ${cfg.priceExtended} € (+${cfg.extendedExtraKmPrice} €/km, +${cfg.extendedExtraMinPrice} €/min)\n`;
-    text += `🗼 Supplément Paris intra-muros : +${cfg.parisSupplement} €\n\n`;
-    text += `👥 Suppléments :\n`;
-    text += `  👶 Bébé 0-3 mois : +${cfg.priceBaby} €\n`;
-    text += `  👤 Personne supplémentaire : +${cfg.priceExtraPers} €\n`;
-    text += `  📸 Photos ANTS : +${cfg.priceAnts} €\n\n`;
+    let text = `📍 Zones de tarification (depuis Neuilly-sur-Marne 93330) :\n\n`;
+    text += `  Locale : ≤${cfg.localMaxKm} km / ≤${cfg.localMaxMin} min A/R → ${cfg.priceLocal} €\n`;
+    text += `  Métropolitaine : ≤${cfg.metroMaxKm} km / ≤${cfg.metroMaxMin} min A/R → ${cfg.priceMetro} €\n`;
+    text += `  Étendue : >${cfg.extendedMaxKm} km ou >${cfg.extendedMaxMin} min A/R → ${cfg.priceExtended} €\n`;
+    text += `  Supplément Paris intra-muros : +${cfg.parisSupplement} €\n\n`;
+    text += `💰 Suppléments supplémentaires :\n`;
+    text += `  Bébé 0-3 mois : +${cfg.priceBaby} € par bébé\n`;
+    text += `  Personne supplémentaire : +${cfg.priceExtraPers} € par personne\n`;
+    text += `  Photos ANTS : +${cfg.priceAnts} € par personne\n\n`;
+    text += `⚡ Tarifs supplémentaires :\n`;
+    text += `  Zone Locale : +${cfg.localExtraKmPrice} €/km, +${cfg.localExtraMinPrice} €/min au-delà\n`;
+    text += `  Zone Métropolitaine : +${cfg.metroExtraKmPrice} €/km, +${cfg.metroExtraMinPrice} €/min au-delà\n`;
+    text += `  Zone Étendue : +${cfg.extendedExtraKmPrice} €/km, +${cfg.extendedExtraMinPrice} €/min au-delà\n\n`;
     text += `💡 Exemple Paris 11e (${dist} km, ${timeSimple} min simple / ${timeAR} min A/R) : ${totalExample} €\n`;
-    text += `   Détail : ${base} € (base) + ${cfg.parisSupplement} € (Paris) + ${excessKm} km × ${cfg.extendedExtraKmPrice} € = ${kmCost} € + ${excessMin} min × ${cfg.extendedExtraMinPrice} € = ${minCost} € → Total ${totalExample} €`;
+    text += `   Calcul : ${base} € (base Zone Étendue) + ${cfg.parisSupplement} € (Paris) + ${excessKm} km × ${cfg.extendedExtraKmPrice} € = ${kmCost} € + ${excessMin} min × ${cfg.extendedExtraMinPrice} € = ${minCost} € = ${totalExample} €`;
 
     document.getElementById('plainTextOutput').value = text;
   }
@@ -468,6 +479,11 @@
 
   document.getElementById('addRowBtn').addEventListener('click', () => addRow('', ''));
   document.getElementById('saveAllBtn').addEventListener('click', saveConfig);
+  
+  // Bouton pour ouvrir la page client
+  document.getElementById('openClientBtn').addEventListener('click', () => {
+    window.open('index.html', '_blank');
+  });
 
   document.getElementById('copyConfigBtn').addEventListener('click', () => {
     const text = document.getElementById('configOutput').textContent;

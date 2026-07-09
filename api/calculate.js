@@ -6,28 +6,90 @@ const NEARBY_CITIES = new Set([
 
 function round1(n) { return Math.round(n * 10) / 10; }
 
-function computePrice({ city, department, distanceKm, babiesCount, antsCount }) {
+function computePrice({ city, department, distanceKm, durationMinSimple, babiesCount, antsCount }) {
   const cityN = (city || "").trim().toLowerCase();
+  
+  // Configuration des zones (même que dans index.html)
+  const cfg = {
+    priceStudio: 59,
+    localMaxKm: 16, localMaxMin: 30, priceLocal: 79,
+    localExtraKmPrice: 2.5, localExtraMinPrice: 1.5,
+    metroMaxKm: 35, metroMaxMin: 50, priceMetro: 129,
+    metroExtraKmPrice: 2, metroExtraMinPrice: 1.2,
+    extendedMaxKm: 50, extendedMaxMin: 75, priceExtended: 179,
+    parisSupplement: 30,
+    extendedExtraKmPrice: 1.5, extendedExtraMinPrice: 1
+  };
+  
+  const durationAR = durationMinSimple * 2;
   let basePrice = null;
+  let zone = null;
   let explanation = "";
   
+  // Tarif spécial Studio
   if (cityN.includes("neuilly-sur-marne")) {
-    basePrice = 59; explanation = "Zone 1 : Neuilly-sur-Marne.";
-  } else if (NEARBY_CITIES.has(cityN)) {
-    basePrice = 79; explanation = "Zone 1 : Ville limitrophe.";
-  } else if (department === "75") {
-    basePrice = 150; explanation = "Zone 4 : Paris (75) intra-muros.";
-  } else if (["93", "94", "77"].includes(department)) {
-    if (distanceKm <= 7) {
-      basePrice = 95; explanation = "Zone 2 : Dpt 93/94/77 (≤ 7 km).";
-    } else {
-      basePrice = 125;
-      explanation = "Zone 3 : Déplacement étendu (> 7 km).";
-      if (distanceKm > 12) {
-        const extraKm = distanceKm - 12;
-        basePrice += extraKm * 3.8;
-        explanation += ` (+ ${round1(extraKm)} km à 3,80 €/km).`;
-      }
+    basePrice = cfg.priceStudio;
+    zone = "Studio";
+    explanation = `Forfait Studio Neuilly-sur-Marne : ${basePrice} €`;
+  }
+  // Tarif postal direct (à ajouter si besoin)
+  else if (city && cfg.postalPrices && cfg.postalPrices[city]) {
+    basePrice = cfg.postalPrices[city];
+    zone = "Tarif direct";
+    explanation = `Tarif direct pour ${city} : ${basePrice} €`;
+  }
+  // Zone Locale
+  else if (distanceKm <= cfg.localMaxKm && durationAR <= cfg.localMaxMin) {
+    basePrice = cfg.priceLocal;
+    zone = "Locale";
+    explanation = `Zone Locale (≤${cfg.localMaxKm} km / ≤${cfg.localMaxMin} min A/R) : ${basePrice} €`;
+    
+    const excessKm = Math.max(0, distanceKm - cfg.localMaxKm);
+    const excessMin = Math.max(0, durationAR - cfg.localMaxMin);
+    if (excessKm > 0 || excessMin > 0) {
+      const kmCost = round1(excessKm * cfg.localExtraKmPrice);
+      const minCost = round1(excessMin * cfg.localExtraMinPrice);
+      basePrice += kmCost + minCost;
+      if (excessKm > 0) explanation += ` + ${excessKm} km × ${cfg.localExtraKmPrice} € = ${kmCost} €`;
+      if (excessMin > 0) explanation += ` + ${excessMin} min × ${cfg.localExtraMinPrice} € = ${minCost} €`;
+    }
+  }
+  // Zone Métropolitaine
+  else if (distanceKm <= cfg.metroMaxKm && durationAR <= cfg.metroMaxMin) {
+    basePrice = cfg.priceMetro;
+    zone = "Métropolitaine";
+    explanation = `Zone Métropolitaine (≤${cfg.metroMaxKm} km / ≤${cfg.metroMaxMin} min A/R) : ${basePrice} €`;
+    
+    const excessKm = Math.max(0, distanceKm - cfg.metroMaxKm);
+    const excessMin = Math.max(0, durationAR - cfg.metroMaxMin);
+    if (excessKm > 0 || excessMin > 0) {
+      const kmCost = round1(excessKm * cfg.metroExtraKmPrice);
+      const minCost = round1(excessMin * cfg.metroExtraMinPrice);
+      basePrice += kmCost + minCost;
+      if (excessKm > 0) explanation += ` + ${excessKm} km × ${cfg.metroExtraKmPrice} € = ${kmCost} €`;
+      if (excessMin > 0) explanation += ` + ${excessMin} min × ${cfg.metroExtraMinPrice} € = ${minCost} €`;
+    }
+  }
+  // Zone Étendue
+  else {
+    basePrice = cfg.priceExtended;
+    zone = "Étendue";
+    explanation = `Zone Étendue (>${cfg.extendedMaxKm} km ou >${cfg.extendedMaxMin} min A/R) : ${basePrice} €`;
+    
+    const excessKm = Math.max(0, distanceKm - cfg.extendedMaxKm);
+    const excessMin = Math.max(0, durationAR - cfg.extendedMaxMin);
+    
+    if (department === "75") {
+      basePrice += cfg.parisSupplement;
+      explanation += ` + supplément Paris : ${cfg.parisSupplement} €`;
+    }
+    
+    if (excessKm > 0 || excessMin > 0) {
+      const kmCost = round1(excessKm * cfg.extendedExtraKmPrice);
+      const minCost = round1(excessMin * cfg.extendedExtraMinPrice);
+      basePrice += kmCost + minCost;
+      if (excessKm > 0) explanation += ` + ${excessKm} km × ${cfg.extendedExtraKmPrice} € = ${kmCost} €`;
+      if (excessMin > 0) explanation += ` + ${excessMin} min × ${cfg.extendedExtraMinPrice} € = ${minCost} €`;
     }
   }
 
@@ -42,7 +104,7 @@ function computePrice({ city, department, distanceKm, babiesCount, antsCount }) 
   if (extraBabies > 0) explanation += ` | +${extraBabies}€ (Bébés)`;
   if (extraAnts > 0) explanation += ` | +${extraAnts}€ (ANTS)`;
 
-  return { price: finalPrice, explanation };
+  return { price: finalPrice, explanation, zone, distanceKm, durationAR };
 }
 
 async function geocode(address) {
@@ -83,10 +145,14 @@ module.exports = async (req, res) => {
     }
 
     const distanceKm = round1(routeData.routes[0].distance / 1000);
+    const durationMinSimple = round1(routeData.routes[0].duration / 60);
+    const durationAR = durationMinSimple * 2;
+    
     const pricing = computePrice({ 
       city: client.city, 
       department: client.department, 
       distanceKm,
+      durationMinSimple,
       babiesCount,
       antsCount
     });
@@ -94,8 +160,11 @@ module.exports = async (req, res) => {
     res.status(200).json({
       cityLabel: client.city.charAt(0).toUpperCase() + client.city.slice(1),
       distanceKm,
+      durationMinSimple,
+      durationAR,
       price: pricing.price,
-      explanation: pricing.explanation
+      explanation: pricing.explanation,
+      zone: pricing.zone
     });
   } catch (err) {
     res.status(400).json({ error: err.message });
